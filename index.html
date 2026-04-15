@@ -179,12 +179,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
           <div><label class="lbl">Nombre cliente</label><input class="inp" id="f-nombre" placeholder="Familia García" oninput="actualizarCuotas()"></div>
           <div>
             <label class="lbl">Destino</label>
-            <select class="inp" id="f-destino" onchange="actualizarCuotas()">
-              <option>Bariloche</option><option>Mendoza</option><option>Iguazú</option>
-              <option>Salta / Jujuy</option><option>Córdoba</option><option>Villa La Angostura</option>
-              <option>San Martín de los Andes</option><option>Brasil — Búzios</option>
-              <option>Brasil — Río de Janeiro</option><option>Brasil — Copa Cabana</option>
-            </select>
+            <input class="inp" type="text" id="f-destino" placeholder="Ej: Bariloche, Florianópolis, Cancún..." oninput="actualizarCuotas()">
           </div>
         </div>
         <div class="grid-3">
