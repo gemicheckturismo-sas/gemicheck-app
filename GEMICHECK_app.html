@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Gemicheck — Cotizador</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --az:#003580;--az2:#1a56c4;--az3:#e8f0fd;
+  --gris:#f4f6fa;--gris2:#e8ecf3;--gris3:#d0d7e8;
+  --txt:#1a2340;--mut:#6b7a99;
+  --vrd:#1aaa55;--rjo:#e24b4a;--nar:#f59e0b;
+  --sombra:0 4px 24px rgba(0,53,128,.10);
+}
+body{font-family:'Inter',sans-serif;background:var(--gris);color:var(--txt);min-height:100vh}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#001a4d 0%,#003580 50%,#0a4fa0 100%)}
+.login-box{background:#fff;border-radius:20px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:28px;color:var(--az);text-align:center;letter-spacing:2px;margin-bottom:4px}
+.login-sub{text-align:center;font-size:13px;color:var(--mut);margin-bottom:28px}
+.login-box label{font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+.login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--gris2);border-radius:10px;font-size:14px;margin-bottom:14px;font-family:'Inter',sans-serif}
+.login-box input:focus{outline:none;border-color:var(--az2)}
+.btn-login{width:100%;padding:13px;background:var(--az);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;letter-spacing:.5px;transition:.15s}
+.btn-login:hover{background:var(--az2)}
+.login-err{color:var(--rjo);font-size:13px;text-align:center;margin-top:10px;display:none}
+
+/* NAV */
+#app-screen{display:none}
+.nav{background:var(--az);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.nav-logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:16px;color:#fff;letter-spacing:1px}
+.nav-user{display:flex;align-items:center;gap:10px}
+.nav-badge{background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.btn-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:1.5px solid var(--gris2);padding:0 20px;overflow-x:auto}
+.tab{padding:14px 18px;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:.15s}
+.tab.active{color:var(--az);border-bottom-color:var(--az)}
+
+/* CONTENT */
+.content{padding:20px;max-width:1100px;margin:0 auto}
+
+/* CARDS */
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:var(--sombra);margin-bottom:16px}
+.card-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;color:var(--az);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';width:5px;height:5px;background:var(--az2);border-radius:50%;display:inline-block}
+
+/* FORM */
+label.lbl{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px}
+input.inp,select.inp,textarea.inp{width:100%;padding:9px 11px;border:1.5px solid var(--gris2);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);background:#fff;transition:border .15s}
+input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:var(--az2)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.mb12{margin-bottom:12px}
+
+/* ITEMS */
+.item-row{display:grid;grid-template-columns:130px 1fr 80px 90px 28px;gap:6px;align-items:center;margin-bottom:6px}
+.col-hds{display:grid;grid-template-columns:130px 1fr 80px 90px 28px;gap:6px;margin-bottom:4px}
+.col-hd{font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase}
+.en-ars{font-size:11px;color:var(--mut);text-align:right}
+.btn-x{background:none;border:none;color:#c0c8d8;cursor:pointer;font-size:18px;padding:0 3px}
+.btn-x:hover{color:var(--rjo)}
+
+/* TOTAL BAR */
+.total-bar{background:var(--az);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.total-lbl{font-size:11px;color:rgba(255,255,255,.7);font-weight:600;text-transform:uppercase}
+.total-num{font-family:'Montserrat',sans-serif;font-weight:800;font-size:20px;color:#fff}
+
+/* CUOTAS */
+.cuota-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:.5px solid var(--gris2)}
+.cuota-row:last-child{border:none}
+.cuota-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;color:var(--az)}
+
+/* BUTTONS */
+.btn{padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.15s}
+.btn-prim{background:var(--az);color:#fff}.btn-prim:hover{background:var(--az2)}
+.btn-ok{background:var(--vrd);color:#fff}
+.btn-out{background:#fff;color:var(--az);border:1.5px solid var(--az)}.btn-out:hover{background:var(--az3)}
+.btn-sm{padding:6px 11px;font-size:11px}
+.btn-danger{background:#fff;color:var(--rjo);border:1.5px solid #fca5a5}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* HISTORIAL */
+.hist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.hist-card{background:#fff;border-radius:12px;padding:14px 16px;border:1.5px solid var(--gris2);transition:.15s;cursor:pointer}
+.hist-card:hover{border-color:var(--az2);box-shadow:0 4px 16px rgba(0,53,128,.1)}
+.hist-nombre{font-weight:700;font-size:14px;color:var(--txt)}
+.hist-dest{font-size:12px;color:var(--mut);margin-top:2px}
+.hist-precio{font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;color:var(--az);margin-top:6px}
+.hist-fecha{font-size:11px;color:var(--mut)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-top:6px}
+.badge-pend{background:#fef3c7;color:#92400e}
+.badge-conf{background:#d1fae5;color:#065f46}
+.badge-canc{background:#fee2e2;color:#991b1b}
+.hist-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:.5px solid var(--gris2)}
+
+/* EXTRAS */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.check-lbl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt);cursor:pointer;font-weight:500}
+.check-lbl input[type=checkbox]{width:15px;height:15px;flex-shrink:0}
+
+/* WSP TEXT */
+.wsp-box{background:var(--gris);border-radius:8px;padding:12px;font-size:12px;line-height:1.9;color:var(--txt);white-space:pre-wrap;margin-top:8px;min-height:40px}
+
+/* LINK INPUT */
+.link-row{display:flex;gap:6px;align-items:center}
+.link-row input{flex:1}
+.link-row a{font-size:12px;color:var(--az2);text-decoration:none;white-space:nowrap;font-weight:600}
+.link-row a:hover{text-decoration:underline}
+
+/* NOTIF */
+.notif{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:.3s;pointer-events:none;color:#fff}
+.notif.show{opacity:1}
+.notif-ok{background:var(--vrd)}
+.notif-err{background:var(--rjo)}
+
+/* ESTADOS */
+.estado-sel{display:flex;gap:6px;margin-top:8px}
+.estado-btn{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:.15s}
+.estado-btn.pend{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.estado-btn.conf{background:#d1fae5;color:#065f46;border-color:#6ee7b7}
+.estado-btn.canc{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.estado-btn.activo{box-shadow:0 0 0 2px currentColor}
+
+@media(max-width:640px){
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .item-row,.col-hds{grid-template-columns:100px 1fr 70px 80px 24px}
+  .hist-grid{grid-template-columns:1fr}
+  .content{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">GEMICHECK</div>
+    <div class="login-sub">Tu viaje listo ✓</div>
+    <label class="lbl">Email</label>
+    <input class="inp" type="email" id="login-email" placeholder="tu@email.com">
+    <label class="lbl">Contraseña</label>
+    <input class="inp" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Ingresar</button>
+    <div class="login-err" id="login-err">Email o contraseña incorrectos</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+  <div class="nav">
+    <div class="nav-logo">GEMICHECK</div>
+    <div class="nav-user">
+      <span class="nav-badge" id="nav-nombre">—</span>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('cotizar',this)">Nueva cotización</div>
+    <div class="tab" onclick="showTab('historial',this)">Historial</div>
+    <div class="tab" onclick="showTab('clientes',this)">Clientes</div>
+  </div>
+
+  <!-- TAB: COTIZAR -->
+  <div id="tab-cotizar" class="content">
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:16px">
+    <div>
+
+      <!-- CLIENTE -->
+      <div class="card">
+        <div class="card-title">Cliente y destino</div>
+        <div class="grid-2">
+          <div><label class="lbl">Nombre cliente</label><input class="inp" id="f-nombre" placeholder="Familia García" oninput="actualizarCuotas()"></div>
+          <div>
+            <label class="lbl">Destino</label>
+            <select class="inp" id="f-destino" onchange="actualizarCuotas()">
+              <option>Bariloche</option><option>Mendoza</option><option>Iguazú</option>
+              <option>Salta / Jujuy</option><option>Córdoba</option><option>Villa La Angostura</option>
+              <option>San Martín de los Andes</option><option>Brasil — Búzios</option>
+              <option>Brasil — Río de Janeiro</option><option>Brasil — Copa Cabana</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div><label class="lbl">Pasajeros</label><input class="inp" id="f-pax" placeholder="2 adultos, 1 niño"></div>
+          <div><label class="lbl">Check-in</label><input class="inp" id="f-checkin" placeholder="Lun 27/07"></div>
+          <div><label class="lbl">Check-out</label><input class="inp" id="f-checkout" placeholder="Dom 02/08"></div>
+        </div>
+        <div class="mb12"><label class="lbl">Estado</label>
+          <div class="estado-sel">
+            <button class="estado-btn pend activo" onclick="setEstado('pendiente',this)">Pendiente</button>
+            <button class="estado-btn conf" onclick="setEstado('confirmado',this)">Confirmado</button>
+            <button class="estado-btn canc" onclick="setEstado('cancelado',this)">Cancelado</button>
+          </div>
+        </div>
+        <div><label class="lbl">Notas internas</label><textarea class="inp" id="f-notas" rows="2" placeholder="Aniversario, primera vez en el destino..."></textarea></div>
+      </div>
+
+      <!-- VUELOS -->
+      <div class="card">
+        <div class="card-title">Vuelos</div>
+        <div class="grid-2">
+          <div><label class="lbl">Aerolínea ida</label><input class="inp" id="f-aero-ida" placeholder="Jetsmart"></div>
+          <div><label class="lbl">Fecha y horario ida</label><input class="inp" id="f-fecha-ida" placeholder="Mié 15/07 · EZE 07:45 → BRC 10:10"></div>
+        </div>
+        <div class="grid-2">
+          <div><label class="lbl">Aerolínea vuelta</label><input class="inp" id="f-aero-vuelta" placeholder="Aerolíneas"></div>
+          <div><label class="lbl">Fecha y horario vuelta</label><input class="inp" id="f-fecha-vuelta" placeholder="Lun 21/07 · BRC 19:03 → AEP 21:08"></div>
+        </div>
+      </div>
+
+      <!-- HOSPEDAJE -->
+      <div class="card">
+        <div class="card-title">Hospedaje</div>
+        <div class="mb12"><label class="lbl">Descripción</label><input class="inp" id="f-hosp" placeholder="Cómodo monoambiente urbano — Bariloche"></div>
+        <div class="mb12">
+          <label class="lbl">Link Airbnb / Booking</label>
+          <div class="link-row">
+            <input class="inp" id="f-link" placeholder="https://airbnb.com/rooms/...">
+            <a id="link-abrir" href="#" target="_blank" style="display:none">Abrir →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXTRAS -->
+      <div class="card">
+        <div class="card-title">Extras opcionales</div>
+        <div class="check-grid">
+          <label class="check-lbl"><input type="checkbox" id="ex-traslado" onchange="actualizarCuotas()"> Traslado ida y vuelta</label>
+          <label class="check-lbl"><input type="checkbox" id="ex-auto" onchange="actualizarCuotas()"> Auto / alquiler</label>
+          <label class="check-lbl"><input type="checkbox" id="ex-excursion" onchange="toggleExc();actualizarCuotas()"> Excursiones</label>
+          <label class="check-lbl"><input type="checkbox" id="ex-seguro" onchange="actualizarCuotas()"> Seguro de viaje</label>
+        </div>
+        <div id="exc-detalle" style="display:none">
+          <label class="lbl">Detalle excursión</label>
+          <input class="inp" id="f-excursion" placeholder="Ej: Circuito Chico + aerosilla">
+        </div>
+      </div>
+
+      <!-- COSTOS -->
+      <div class="card">
+        <div class="card-title">Costos del paquete</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <label class="lbl" style="margin:0">TC del día:</label>
+          <input class="inp" type="number" id="tc" value="1550" style="width:90px" oninput="actualizarCuotas()">
+          <span style="font-size:11px;color:var(--mut)">ARS por USD</span>
+        </div>
+        <div class="col-hds">
+          <span class="col-hd">Concepto</span><span class="col-hd">Monto</span>
+          <span class="col-hd">Moneda</span><span class="col-hd" style="text-align:right">En ARS</span><span></span>
+        </div>
+        <div id="items-container"></div>
+        <button class="btn btn-out btn-sm" onclick="addItem()" style="margin-top:8px">+ Agregar item</button>
+        <div class="total-bar">
+          <span class="total-lbl">Total paquete</span>
+          <span class="total-num" id="total-num">$0</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-prim" onclick="guardar()">Guardar cotización</button>
+        <button class="btn btn-out" onclick="copiarCuotas()">Copiar cuotas WhatsApp</button>
+        <button class="btn btn-out" onclick="limpiar()">Nueva</button>
+      </div>
+
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div>
+      <div class="card">
+        <div class="card-title">Opciones de pago</div>
+        <div id="cuotas-lista"></div>
+        <div style="margin-top:12px">
+          <div style="font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;margin-bottom:4px">Para WhatsApp</div>
+          <div class="wsp-box" id="wsp-text"></div>
+          <button class="btn btn-out btn-sm" onclick="copiarCuotas()" style="margin-top:8px">Copiar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Texto completo WhatsApp</div>
+        <div class="wsp-box" id="wsp-completo"></div>
+        <button class="btn btn-out btn-sm" onclick="copiarCompleto()" style="margin-top:8px">Copiar mensaje completo</button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- TAB: HISTORIAL -->
+  <div id="tab-historial" class="content" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" style="background:var(--gris2);border:none;font-weight:600" onclick="filtrarHist('todos')">Todos</button>
+        <button class="btn btn-sm" style="background:#fef3c7;color:#92400e;border:none;font-weight:600" onclick="filtrarHist('pendiente')">Pendientes</button>
+        <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;border:none;font-weight:600" onclick="filtrarHist('confirmado')">Confirmados</button>
+        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:none;font-weight:600" onclick="filtrarHist('cancelado')">Cancelados</button>
+      </div>
+      <input class="inp" id="buscar-hist" placeholder="Buscar por nombre..." style="width:200px" oninput="renderHistorial()">
+    </div>
+    <div class="hist-grid" id="historial-grid">
+      <p style="color:var(--mut);font-size:13px">Cargando...</p>
+    </div>
+  </div>
+
+  <!-- TAB: CLIENTES -->
+  <div id="tab-clientes" class="content" style="display:none">
+    <div class="card">
+      <div class="card-title">Base de clientes</div>
+      <div id="clientes-lista"><p style="color:var(--mut);font-size:13px">Cargando...</p></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+const SUPA_URL = 'https://iflpflvalueurrajuubp.supabase.co';
+const SUPA_KEY = 'sb_publishable_xBsIZcKDUdgrxAGjiKAykQ_3xD9H1yD';
+const { createClient } = supabase;
+const db = createClient(SUPA_URL, SUPA_KEY);
+
+const CUOTAS_PCT = [{n:1,p:1.06},{n:2,p:1.10},{n:3,p:1.20},{n:4,p:1.28},{n:5,p:1.34},{n:6,p:1.42}];
+let itemCount = 0, estadoActual = 'pendiente', cotizacionId = null, historialData = [], filtroEstado = 'todos';
+let currentUser = null, currentRole = null;
+
+function fmt(n){return '$'+Math.round(n).toLocaleString('es-AR')}
+
+// AUTH
+async function doLogin(){
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  const {data,error} = await db.auth.signInWithPassword({email,password:pass});
+  if(error){
+    document.getElementById('login-err').style.display='block';
+    return;
+  }
+  currentUser = data.user;
+  await loadUserProfile();
+  showApp();
+}
+
+async function loadUserProfile(){
+  const {data} = await db.from('profiles').select('*').eq('id', currentUser.id).single();
+  if(data){
+    currentRole = data.role;
+    document.getElementById('nav-nombre').textContent = data.nombre || currentUser.email;
+  }
+}
+
+async function doLogout(){
+  await db.auth.signOut();
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  currentUser = null; currentRole = null;
+}
+
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  addItem('Vuelo','','ARS');
+  addItem('Hospedaje','','USD');
+  cargarHistorial();
+}
+
+// TABS
+function showTab(id, el){
+  ['cotizar','historial','clientes'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display='none';
+  });
+  document.getElementById('tab-'+id).style.display='block';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(id==='historial') renderHistorial();
+  if(id==='clientes') renderClientes();
+}
+
+// ESTADO
+function setEstado(estado, el){
+  estadoActual = estado;
+  document.querySelectorAll('.estado-btn').forEach(b=>b.classList.remove('activo'));
+  el.classList.add('activo');
+}
+
+// ITEMS
+function addItem(concepto='', monto='', moneda='ARS'){
+  const id = itemCount++;
+  const container = document.getElementById('items-container');
+  const div = document.createElement('div');
+  div.className = 'item-row'; div.id = 'item-'+id;
+  const conceptos = ['Vuelo','Hospedaje','Traslado','Auto','Excursión','Seguro','Otro'];
+  const opts = conceptos.map(c=>`<option ${c===concepto?'selected':''}>${c}</option>`).join('');
+  div.innerHTML = `
+    <select class="inp" onchange="actualizarCuotas()" style="padding:7px 6px;font-size:12px"><option value="">—</option>${opts}</select>
+    <input class="inp" type="number" placeholder="Monto" value="${monto}" style="font-size:13px" oninput="actualizarCuotas()">
+    <select class="inp" onchange="actualizarCuotas()" style="padding:7px 6px;font-size:12px">
+      <option value="ARS" ${moneda==='ARS'?'selected':''}>ARS</option>
+      <option value="USD" ${moneda==='USD'?'selected':''}>USD</option>
+    </select>
+    <span class="en-ars" id="ars-${id}">—</span>
+    <button class="btn-x" onclick="delItem(${id})">×</button>`;
+  container.appendChild(div);
+  actualizarCuotas();
+}
+
+function delItem(id){
+  const el = document.getElementById('item-'+id);
+  if(el) el.remove();
+  actualizarCuotas();
+}
+
+function toggleExc(){
+  const cb = document.getElementById('ex-excursion');
+  document.getElementById('exc-detalle').style.display = cb.checked ? 'block' : 'none';
+}
+
+function actualizarCuotas(){
+  const tc = parseFloat(document.getElementById('tc').value)||1550;
+  let total = 0;
+  document.querySelectorAll('.item-row').forEach(fila=>{
+    const inputs = fila.querySelectorAll('input[type=number]');
+    const sels = fila.querySelectorAll('select');
+    if(!inputs.length||sels.length<2) return;
+    const monto = parseFloat(inputs[0].value)||0;
+    const moneda = sels[1].value;
+    const enARS = moneda==='USD' ? monto*tc : monto;
+    total += enARS;
+    const span = fila.querySelector('.en-ars');
+    if(span){ span.textContent = monto>0 ? fmt(enARS) : '—'; span.style.color = moneda==='USD' ? '#1a56c4' : 'var(--mut)'; }
+  });
+
+  document.getElementById('total-num').textContent = fmt(total);
+
+  // Link abrir
+  const linkVal = document.getElementById('f-link').value;
+  const linkEl = document.getElementById('link-abrir');
+  if(linkVal && linkVal.startsWith('http')){
+    linkEl.href = linkVal; linkEl.style.display = 'inline';
+  } else { linkEl.style.display = 'none'; }
+
+  // Cuotas
+  const lista = document.getElementById('cuotas-lista');
+  lista.innerHTML = '';
+  let lineas = [];
+  CUOTAS_PCT.forEach(c=>{
+    const tot = Math.round(total*c.p);
+    const pc = Math.round(tot/c.n);
+    const lbl = c.n===1 ? '1 pago' : `${c.n} pagos`;
+    const intLbl = c.n===1 ? '' : `+${Math.round((c.p-1)*100)}%`;
+    const div = document.createElement('div');
+    div.className = 'cuota-row';
+    div.innerHTML = `<span style="font-size:13px;color:var(--txt)">${lbl}</span><span style="font-size:11px;color:var(--mut)">${intLbl}</span><span class="cuota-val" style="font-size:${c.n===1?'16':'14'}px">${fmt(pc)}</span>`;
+    lista.appendChild(div);
+    lineas.push(`${lbl} de ${fmt(pc)}`);
+  });
+
+  document.getElementById('wsp-text').textContent = lineas.join('\n');
+
+  // Texto completo
+  const nombre = document.getElementById('f-nombre').value || '';
+  const dest = document.getElementById('f-destino').value;
+  const pax = document.getElementById('f-pax').value;
+  const checkin = document.getElementById('f-checkin').value;
+  const checkout = document.getElementById('f-checkout').value;
+  const aeroIda = document.getElementById('f-aero-ida').value;
+  const fechaIda = document.getElementById('f-fecha-ida').value;
+  const aeroVuelta = document.getElementById('f-aero-vuelta').value;
+  const fechaVuelta = document.getElementById('f-fecha-vuelta').value;
+  const hosp = document.getElementById('f-hosp').value;
+
+  let completo = '';
+  if(aeroIda && fechaIda) completo += `Ida ${aeroIda} - ${fechaIda}\n`;
+  if(aeroVuelta && fechaVuelta) completo += `Vuelta ${aeroVuelta} - ${fechaVuelta}\n`;
+  if(hosp) completo += `Hospedaje: ${hosp}`;
+  if(checkin && checkout) completo += ` (${checkin} al ${checkout})`;
+  if(hosp||checkin) completo += '\n';
+  if(pax) completo += `${pax}\n`;
+  completo += '\n' + lineas.join('\n');
+  document.getElementById('wsp-completo').textContent = completo;
+}
+
+// GUARDAR
+async function guardar(){
+  if(!currentUser){ notif('Debés iniciar sesión', 'err'); return; }
+  const tc = parseFloat(document.getElementById('tc').value)||1550;
+  let total = 0;
+  const items = [];
+  document.querySelectorAll('.item-row').forEach(fila=>{
+    const inputs = fila.querySelectorAll('input[type=number]');
+    const sels = fila.querySelectorAll('select');
+    if(!inputs.length||sels.length<2) return;
+    const concepto = sels[0].value;
+    const monto = parseFloat(inputs[0].value)||0;
+    const moneda = sels[1].value;
+    const enARS = moneda==='USD' ? monto*tc : monto;
+    total += enARS;
+    if(monto>0) items.push({concepto,monto,moneda,enARS});
+  });
+
+  const payload = {
+    user_id: currentUser.id,
+    nombre: document.getElementById('f-nombre').value||'Sin nombre',
+    destino: document.getElementById('f-destino').value,
+    pasajeros: document.getElementById('f-pax').value,
+    checkin: document.getElementById('f-checkin').value,
+    checkout: document.getElementById('f-checkout').value,
+    aero_ida: document.getElementById('f-aero-ida').value,
+    fecha_ida: document.getElementById('f-fecha-ida').value,
+    aero_vuelta: document.getElementById('f-aero-vuelta').value,
+    fecha_vuelta: document.getElementById('f-fecha-vuelta').value,
+    hospedaje: document.getElementById('f-hosp').value,
+    link_hospedaje: document.getElementById('f-link').value,
+    notas: document.getElementById('f-notas').value,
+    estado: estadoActual,
+    tc, total,
+    items: JSON.stringify(items),
+    extra_traslado: document.getElementById('ex-traslado').checked,
+    extra_auto: document.getElementById('ex-auto').checked,
+    extra_excursion: document.getElementById('ex-excursion').checked,
+    extra_seguro: document.getElementById('ex-seguro').checked,
+    excursion_detalle: document.getElementById('f-excursion').value,
+  };
+
+  let result;
+  if(cotizacionId){
+    result = await db.from('cotizaciones').update(payload).eq('id', cotizacionId);
+  } else {
+    result = await db.from('cotizaciones').insert(payload);
+  }
+
+  if(result.error){ notif('Error al guardar: '+result.error.message,'err'); return; }
+  notif('Cotización guardada');
+  await cargarHistorial();
+}
+
+// HISTORIAL
+async function cargarHistorial(){
+  let query = db.from('cotizaciones').select('*').order('created_at',{ascending:false});
+  if(currentRole !== 'admin'){
+    query = query.eq('user_id', currentUser.id);
+  }
+  const {data,error} = await query;
+  if(!error) historialData = data || [];
+}
+
+function filtrarHist(estado){
+  filtroEstado = estado;
+  renderHistorial();
+}
+
+function renderHistorial(){
+  const buscar = (document.getElementById('buscar-hist').value||'').toLowerCase();
+  const grid = document.getElementById('historial-grid');
+  let datos = historialData;
+  if(filtroEstado!=='todos') datos = datos.filter(c=>c.estado===filtroEstado);
+  if(buscar) datos = datos.filter(c=>(c.nombre||'').toLowerCase().includes(buscar));
+  if(!datos.length){ grid.innerHTML='<p style="color:var(--mut);font-size:13px">Sin cotizaciones</p>'; return; }
+
+  grid.innerHTML = '';
+  datos.forEach(c=>{
+    const badgeClass = c.estado==='confirmado'?'conf':c.estado==='cancelado'?'canc':'pend';
+    const badgeLabel = c.estado==='confirmado'?'Confirmado':c.estado==='cancelado'?'Cancelado':'Pendiente';
+    const fecha = new Date(c.created_at).toLocaleDateString('es-AR');
+    const el = document.createElement('div');
+    el.className = 'hist-card';
+    el.innerHTML = `
+      <div class="hist-nombre">${c.nombre}</div>
+      <div class="hist-dest">${c.destino} · ${c.checkin||'—'} → ${c.checkout||'—'}</div>
+      <div class="hist-precio">${fmt(c.total)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="badge badge-${badgeClass}">${badgeLabel}</span>
+        <span class="hist-fecha">${fecha}</span>
+      </div>
+      ${c.link_hospedaje ? `<div style="margin-top:6px"><a href="${c.link_hospedaje}" target="_blank" style="font-size:12px;color:var(--az2);font-weight:600">Ver hospedaje →</a></div>` : ''}
+      <div class="hist-actions">
+        <button class="btn btn-out btn-sm" onclick='cargarCotizacion(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Editar</button>
+        <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;border:none;font-weight:600" onclick="cambiarEstado('${c.id}','confirmado')">Confirmar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminar('${c.id}')">Eliminar</button>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+
+function cargarCotizacion(c){
+  cotizacionId = c.id;
+  document.getElementById('f-nombre').value = c.nombre||'';
+  document.getElementById('f-destino').value = c.destino||'Bariloche';
+  document.getElementById('f-pax').value = c.pasajeros||'';
+  document.getElementById('f-checkin').value = c.checkin||'';
+  document.getElementById('f-checkout').value = c.checkout||'';
+  document.getElementById('f-aero-ida').value = c.aero_ida||'';
+  document.getElementById('f-fecha-ida').value = c.fecha_ida||'';
+  document.getElementById('f-aero-vuelta').value = c.aero_vuelta||'';
+  document.getElementById('f-fecha-vuelta').value = c.fecha_vuelta||'';
+  document.getElementById('f-hosp').value = c.hospedaje||'';
+  document.getElementById('f-link').value = c.link_hospedaje||'';
+  document.getElementById('f-notas').value = c.notas||'';
+  document.getElementById('tc').value = c.tc||1550;
+  document.getElementById('ex-traslado').checked = c.extra_traslado||false;
+  document.getElementById('ex-auto').checked = c.extra_auto||false;
+  document.getElementById('ex-excursion').checked = c.extra_excursion||false;
+  document.getElementById('ex-seguro').checked = c.extra_seguro||false;
+  document.getElementById('f-excursion').value = c.excursion_detalle||'';
+  if(c.extra_excursion) document.getElementById('exc-detalle').style.display='block';
+
+  document.getElementById('items-container').innerHTML=''; itemCount=0;
+  if(c.items){
+    const items = JSON.parse(c.items);
+    items.forEach(it=>addItem(it.concepto, it.monto, it.moneda));
+  }
+  estadoActual = c.estado||'pendiente';
+  document.querySelectorAll('.estado-btn').forEach(b=>b.classList.remove('activo'));
+  document.querySelector(`.estado-btn.${estadoActual==='confirmado'?'conf':estadoActual==='cancelado'?'canc':'pend'}`).classList.add('activo');
+
+  showTab('cotizar', document.querySelector('.tab'));
+  document.querySelector('.tab').classList.add('active');
+  actualizarCuotas();
+  notif('Cotización cargada');
+  window.scrollTo(0,0);
+}
+
+async function cambiarEstado(id, estado){
+  const {error} = await db.from('cotizaciones').update({estado}).eq('id',id);
+  if(!error){ await cargarHistorial(); renderHistorial(); notif('Estado actualizado'); }
+}
+
+async function eliminar(id){
+  if(!confirm('¿Eliminar esta cotización?')) return;
+  await db.from('cotizaciones').delete().eq('id',id);
+  await cargarHistorial(); renderHistorial();
+  notif('Eliminada');
+}
+
+// CLIENTES
+async function renderClientes(){
+  const {data} = await db.from('cotizaciones').select('nombre,destino,total,estado,created_at').order('nombre');
+  if(!data){ return; }
+  const agrupado = {};
+  data.forEach(c=>{
+    if(!agrupado[c.nombre]) agrupado[c.nombre]={cotizaciones:[],total:0};
+    agrupado[c.nombre].cotizaciones.push(c);
+    if(c.estado==='confirmado') agrupado[c.nombre].total+=c.total;
+  });
+  const div = document.getElementById('clientes-lista');
+  div.innerHTML = '';
+  Object.entries(agrupado).forEach(([nombre,data])=>{
+    const el = document.createElement('div');
+    el.style.cssText='padding:12px 0;border-bottom:.5px solid var(--gris2)';
+    el.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:600;font-size:14px">${nombre}</div>
+          <div style="font-size:12px;color:var(--mut)">${data.cotizaciones.length} cotización${data.cotizaciones.length>1?'es':''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:var(--az)">${fmt(data.total)}</div>
+          <div style="font-size:11px;color:var(--mut)">confirmado</div>
+        </div>
+      </div>`;
+    div.appendChild(el);
+  });
+}
+
+function limpiar(){
+  cotizacionId=null;
+  ['f-nombre','f-pax','f-checkin','f-checkout','f-aero-ida','f-fecha-ida','f-aero-vuelta','f-fecha-vuelta','f-hosp','f-link','f-notas','f-excursion'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['ex-traslado','ex-auto','ex-excursion','ex-seguro'].forEach(id=>{
+    document.getElementById(id).checked=false;
+  });
+  document.getElementById('exc-detalle').style.display='none';
+  document.getElementById('items-container').innerHTML=''; itemCount=0;
+  estadoActual='pendiente';
+  document.querySelectorAll('.estado-btn').forEach(b=>b.classList.remove('activo'));
+  document.querySelector('.estado-btn.pend').classList.add('activo');
+  addItem('Vuelo','','ARS'); addItem('Hospedaje','','USD');
+  actualizarCuotas();
+  notif('Lista para nueva cotización');
+}
+
+function copiarCuotas(){
+  navigator.clipboard.writeText(document.getElementById('wsp-text').textContent).then(()=>notif('Cuotas copiadas'));
+}
+function copiarCompleto(){
+  navigator.clipboard.writeText(document.getElementById('wsp-completo').textContent).then(()=>notif('Mensaje copiado'));
+}
+
+function notif(msg,tipo='ok'){
+  const n=document.getElementById('notif');
+  n.textContent=msg; n.className=`notif notif-${tipo} show`;
+  setTimeout(()=>n.classList.remove('show'),2500);
+}
+
+// Init
+db.auth.getSession().then(({data})=>{
+  if(data.session){
+    currentUser=data.session.user;
+    loadUserProfile().then(()=>{showApp()});
+  }
+});
+</script>
+</body>
+</html>
