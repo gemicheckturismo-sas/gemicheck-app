@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Gemicheck — Cotizador</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -326,7 +319,9 @@ const SUPA_KEY = 'sb_publishable_xBsIZcKDUdgrxAGjiKAykQ_3xD9H1yD';
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 
-const CUOTAS_PCT = [{n:1,p:1.06},{n:2,p:1.10},{n:3,p:1.20},{n:4,p:1.28},{n:5,p:1.34},{n:6,p:1.42}];
+const CUOTAS_ADMIN = [{n:1,p:1.06},{n:2,p:1.10},{n:3,p:1.20},{n:4,p:1.28},{n:5,p:1.34},{n:6,p:1.42}];
+const CUOTAS_VEND = [{n:1,p:1.10},{n:2,p:1.16},{n:3,p:1.23},{n:4,p:1.32},{n:5,p:1.40},{n:6,p:1.48}];
+function getCuotas(){ return currentRole==='admin' ? CUOTAS_ADMIN : CUOTAS_VEND; }
 let itemCount = 0, estadoActual = 'pendiente', cotizacionId = null, historialData = [], filtroEstado = 'todos';
 let currentUser = null, currentRole = null;
 
@@ -448,7 +443,7 @@ function actualizarCuotas(){
   const lista = document.getElementById('cuotas-lista');
   lista.innerHTML = '';
   let lineas = [];
-  CUOTAS_PCT.forEach(c=>{
+  getCuotas().forEach(c=>{
     const tot = Math.round(total*c.p);
     const pc = Math.round(tot/c.n);
     const lbl = c.n===1 ? '1 pago' : `${c.n} pagos`;
@@ -462,9 +457,24 @@ function actualizarCuotas(){
 
   document.getElementById('wsp-text').textContent = lineas.join('\n');
 
+  // WSP se actualiza via actualizarWSP()
+}
+
+function actualizarWSP(){
+  const lineas = [];
+  getCuotas().forEach((c,i)=>{
+    const input = document.getElementById('cuota-input-'+i);
+    if(!input) return;
+    const val = parseInt(input.value)||0;
+    const lbl = c.n===1?'1 pago':`${c.n} pagos`;
+    if(val>0) lineas.push(`${lbl} de ${fmt(val)}`);
+  });
+  const wspText = lineas.join('\n');
+  const wspEl = document.getElementById('wsp-text');
+  if(wspEl) wspEl.textContent = wspText;
+
   // Texto completo
-  const nombre = document.getElementById('f-nombre').value || '';
-  const dest = document.getElementById('f-destino').value;
+  const nombre = document.getElementById('f-nombre').value||'';
   const pax = document.getElementById('f-pax').value;
   const checkin = document.getElementById('f-checkin').value;
   const checkout = document.getElementById('f-checkout').value;
@@ -473,16 +483,16 @@ function actualizarCuotas(){
   const aeroVuelta = document.getElementById('f-aero-vuelta').value;
   const fechaVuelta = document.getElementById('f-fecha-vuelta').value;
   const hosp = document.getElementById('f-hosp').value;
-
   let completo = '';
-  if(aeroIda && fechaIda) completo += `Ida ${aeroIda} - ${fechaIda}\n`;
-  if(aeroVuelta && fechaVuelta) completo += `Vuelta ${aeroVuelta} - ${fechaVuelta}\n`;
-  if(hosp) completo += `Hospedaje: ${hosp}`;
-  if(checkin && checkout) completo += ` (${checkin} al ${checkout})`;
-  if(hosp||checkin) completo += '\n';
-  if(pax) completo += `${pax}\n`;
-  completo += '\n' + lineas.join('\n');
-  document.getElementById('wsp-completo').textContent = completo;
+  if(aeroIda&&fechaIda) completo+=`Ida ${aeroIda} - ${fechaIda}\n`;
+  if(aeroVuelta&&fechaVuelta) completo+=`Vuelta ${aeroVuelta} - ${fechaVuelta}\n`;
+  if(hosp) completo+=`Hospedaje: ${hosp}`;
+  if(checkin&&checkout) completo+=` (${checkin} al ${checkout})`;
+  if(hosp||checkin) completo+='\n';
+  if(pax) completo+=`${pax}\n`;
+  completo+='\n'+wspText;
+  const wc = document.getElementById('wsp-completo');
+  if(wc) wc.textContent=completo;
 }
 
 // GUARDAR
