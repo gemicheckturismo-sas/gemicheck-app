@@ -100,6 +100,18 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 .check-lbl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt);cursor:pointer;font-weight:500}
 .check-lbl input[type=checkbox]{width:15px;height:15px;flex-shrink:0}
 
+/* FLYER BENEFIT CHIPS */
+.fm-chips-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.fm-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:20px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.65);transition:.15s;user-select:none}
+.fm-chip input[type=checkbox]{display:none}
+.fm-chip.checked{background:rgba(74,144,226,.2);border-color:#4A90E2;color:#fff}
+.fm-ben-custom-item{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border-radius:6px;padding:5px 10px;margin-bottom:4px}
+.fm-ben-custom-inp{flex:1;background:none;border:none;color:#fff;font-size:13px;outline:none;font-family:'Inter',sans-serif}
+.fm-ben-custom-inp::placeholder{color:rgba(255,255,255,.3)}
+.fm-ben-custom-rm{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:18px;padding:0;line-height:1;flex-shrink:0}
+.fm-ben-add-btn{padding:5px 12px;background:rgba(255,255,255,.06);border:1.5px dashed rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+.fm-ben-add-btn:hover{border-color:rgba(255,255,255,.35);color:rgba(255,255,255,.7)}
+
 /* WSP TEXT */
 .wsp-box{background:var(--gris);border-radius:8px;padding:12px;font-size:12px;line-height:1.9;color:var(--txt);white-space:pre-wrap;margin-top:8px;min-height:40px}
 
@@ -532,10 +544,15 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
           </div>
         </div>
         <div class="fm-section">
-          <div class="fm-section-title">Beneficios (uno por línea)</div>
-          <textarea id="fm-beneficios" rows="4" oninput="actualizarFlyer()">Traslados aeropuerto incluidos
-Desayuno buffet diario
-Actividades opcionales</textarea>
+          <div class="fm-section-title">Beneficios adicionales</div>
+          <div class="fm-chips-wrap" id="fm-ben-chips">
+            <label class="fm-chip" data-val="Traslado desde Aeropuerto" onclick="toggleChip(this)"><input type="checkbox"><span>Traslado desde Aeropuerto</span></label>
+            <label class="fm-chip" data-val="Excursiones incluidas" onclick="toggleChip(this)"><input type="checkbox"><span>Excursiones incluidas</span></label>
+            <label class="fm-chip" data-val="Auto / alquiler" onclick="toggleChip(this)"><input type="checkbox"><span>Auto / alquiler</span></label>
+            <label class="fm-chip" data-val="Seguro de viaje" onclick="toggleChip(this)"><input type="checkbox"><span>Seguro de viaje</span></label>
+          </div>
+          <div id="fm-ben-custom-list"></div>
+          <button type="button" class="fm-ben-add-btn" onclick="addBenCustom()">+ Agregar beneficio</button>
         </div>
         <div class="fm-section">
           <div class="fm-section-title">Tarifas (cuotas)</div>
@@ -581,7 +598,11 @@ Actividades opcionales</textarea>
           <div class="flyer-hosp-dates" id="flyer-hosp-dates"></div>
         </div>
       </div>
-      <div class="flyer-ben-list" id="flyer-ben-list"></div>
+      <div class="flyer-ben-list" id="flyer-ben-list">
+        <div class="flyer-ben-item"><span class="flyer-ben-check">✓</span><span class="flyer-ben-txt">Asesoría pre-viaje personalizada</span></div>
+        <div class="flyer-ben-item"><span class="flyer-ben-check">✓</span><span class="flyer-ben-txt">Recomendaciones sobre el destino</span></div>
+        <div class="flyer-ben-item"><span class="flyer-ben-check">✓</span><span class="flyer-ben-txt">Alertas y actualizaciones de vuelo</span></div>
+      </div>
     </div>
   </div>
   <div class="flyer-circle">
@@ -1202,6 +1223,33 @@ function flyerFotoPropia(input){
   reader.readAsDataURL(input.files[0]);
 }
 
+function toggleChip(label){
+  label.classList.toggle('checked');
+  label.querySelector('input').checked = label.classList.contains('checked');
+  actualizarFlyer();
+}
+
+function addBenCustom(){
+  const list = document.getElementById('fm-ben-custom-list');
+  if(!list) return;
+  const item = document.createElement('div');
+  item.className = 'fm-ben-custom-item';
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'fm-ben-custom-inp';
+  inp.placeholder = 'Beneficio personalizado...';
+  inp.oninput = function(){ actualizarFlyer(); };
+  const rm = document.createElement('button');
+  rm.type = 'button';
+  rm.className = 'fm-ben-custom-rm';
+  rm.textContent = '×';
+  rm.onclick = function(){ item.remove(); actualizarFlyer(); };
+  item.appendChild(inp);
+  item.appendChild(rm);
+  list.appendChild(item);
+  inp.focus();
+}
+
 function buildDestGrid(){
   const grid = document.getElementById('fm-dest-grid');
   if(!grid) return;
@@ -1239,10 +1287,12 @@ function selectDestThumb(key){
 function setFlyerBg(src){
   const img = document.getElementById('flyer-bg-img');
   if(!img) return;
+  img.onload = function(){ syncPreview(); };
   img.onerror = function(){
     const bg = document.querySelector('#flyer-div .flyer-bg');
     if(bg) bg.style.background = 'linear-gradient(135deg,#001a4d 0%,#003580 50%,#1a56c4 100%)';
     this.style.display='none';
+    syncPreview();
   };
   img.src = src || '';
   img.style.display = src ? '' : 'none';
@@ -1336,24 +1386,27 @@ function actualizarFlyer(){
     }
   }
 
-  const bensVal = (document.getElementById('fm-beneficios')||{}).value || '';
   const benList = document.getElementById('flyer-ben-list');
   if(benList){
-    benList.innerHTML = '';
-    bensVal.split('\n').forEach(function(line){
-      const t = line.trim();
-      if(!t) return;
+    benList.querySelectorAll('.flyer-ben-dynamic').forEach(function(el){ el.remove(); });
+    var addBen = function(txt){
       const item = document.createElement('div');
-      item.className = 'flyer-ben-item';
+      item.className = 'flyer-ben-item flyer-ben-dynamic';
       const chk = document.createElement('span');
       chk.className = 'flyer-ben-check';
       chk.textContent = '✓';
-      const txt = document.createElement('span');
-      txt.className = 'flyer-ben-txt';
-      txt.textContent = t;
+      const t = document.createElement('span');
+      t.className = 'flyer-ben-txt';
+      t.textContent = txt;
       item.appendChild(chk);
-      item.appendChild(txt);
+      item.appendChild(t);
       benList.appendChild(item);
+    };
+    document.querySelectorAll('#fm-ben-chips .fm-chip.checked').forEach(function(chip){
+      addBen(chip.dataset.val);
+    });
+    document.querySelectorAll('#fm-ben-custom-list .fm-ben-custom-inp').forEach(function(inp){
+      if(inp.value.trim()) addBen(inp.value.trim());
     });
   }
 
@@ -1383,6 +1436,7 @@ function syncPreview(){
   const sc = Math.min(dstW / 1080, dstH / 1350);
   const clone = src.cloneNode(true);
   clone.removeAttribute('id');
+  clone.querySelectorAll('[id]').forEach(function(el){ el.removeAttribute('id'); });
   clone.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1350px;overflow:hidden;font-family:Montserrat,sans-serif;transform:scale(' + sc + ');transform-origin:top left;pointer-events:none';
   dst.innerHTML = '';
   dst.appendChild(clone);
@@ -1414,6 +1468,31 @@ function abrirFlyerModal(){
   const co = document.getElementById('f-checkout');
   if(ci){ const fm=document.getElementById('fm-checkin'); if(fm) fm.value=ci.value||''; }
   if(co){ const fm=document.getElementById('fm-checkout'); if(fm) fm.value=co.value||''; }
+
+  // Reset chips
+  document.querySelectorAll('#fm-ben-chips .fm-chip').forEach(function(c){
+    c.classList.remove('checked');
+    c.querySelector('input').checked = false;
+  });
+  document.getElementById('fm-ben-custom-list').innerHTML = '';
+  // Pre-match chips from cotizador extras
+  var extraMap = {
+    'ex-traslado':  'Traslado desde Aeropuerto',
+    'ex-excursion': 'Excursiones incluidas',
+    'ex-auto':      'Auto / alquiler',
+    'ex-seguro':    'Seguro de viaje'
+  };
+  Object.keys(extraMap).forEach(function(exId){
+    var cb = document.getElementById(exId);
+    if(cb && cb.checked){
+      document.querySelectorAll('#fm-ben-chips .fm-chip').forEach(function(chip){
+        if(chip.dataset.val === extraMap[exId]){
+          chip.classList.add('checked');
+          chip.querySelector('input').checked = true;
+        }
+      });
+    }
+  });
 
   if(typeof flyerCuotas !== 'undefined' && flyerCuotas){
     var map = {1:'fm-c1',3:'fm-c3',6:'fm-c6',12:'fm-c12',18:'fm-c18',24:'fm-c24'};
@@ -1452,6 +1531,7 @@ async function descargarFlyer(){
     const src = document.getElementById('flyer-div');
     const clone = src.cloneNode(true);
     clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(function(el){ el.removeAttribute('id'); });
     clone.style.cssText = 'position:absolute;left:-9999px;top:0;width:1080px;height:1350px;overflow:hidden;font-family:Montserrat,sans-serif';
 
     const bgImg = clone.querySelector('.flyer-bg-img');
