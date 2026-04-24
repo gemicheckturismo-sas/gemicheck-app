@@ -217,11 +217,11 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 /* FLYER DIV */
 #flyer-div{position:fixed;left:-9999px;top:0;width:1080px;height:1350px;overflow:hidden;font-family:'Montserrat',sans-serif}
 .flyer-bg{position:absolute;inset:0;background:#001a4d}
-.flyer-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
-.flyer-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,20,70,.55) 0%,rgba(0,10,40,.82) 60%,rgba(0,5,25,.97) 100%)}
+.flyer-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.70}
+.flyer-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,26,77,.22) 0%,rgba(0,10,40,.60) 60%,rgba(0,5,25,.90) 100%)}
 .flyer-content{position:absolute;inset:0;display:flex;flex-direction:column;padding:52px 72px 680px}
 .flyer-logo-wrap{text-align:center;margin-bottom:24px}
-.flyer-logo-img{width:220px;height:auto;display:block;margin:0 auto}
+.flyer-logo-img{width:220px;height:auto;display:block;margin:0 auto;mix-blend-mode:screen}
 .flyer-pre{font-family:'Montserrat',sans-serif;font-size:50px;font-weight:700;color:#fff;text-align:center;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;line-height:1.1}
 .flyer-dest{font-family:'Dancing Script',cursive;font-weight:700;font-size:96px;color:#4A90E2;text-align:center;line-height:1.05;margin-bottom:28px}
 .flyer-info-block{display:flex;flex-direction:column;gap:18px}
@@ -535,11 +535,11 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
           <div class="fm-row" style="margin-top:8px">
             <div>
               <label>Check-in</label>
-              <input type="date" id="fm-checkin" oninput="actualizarFlyer()">
+              <input type="text" id="fm-checkin" placeholder="ej: Lun 27/07" oninput="actualizarFlyer()">
             </div>
             <div>
               <label>Check-out</label>
-              <input type="date" id="fm-checkout" oninput="actualizarFlyer()">
+              <input type="text" id="fm-checkout" placeholder="ej: Vie 01/08" oninput="actualizarFlyer()">
             </div>
           </div>
         </div>
@@ -1302,7 +1302,7 @@ function buildCuotasInputs(){
   const wrap = document.getElementById('fm-cuotas-wrap');
   if(!wrap) return;
   wrap.innerHTML = '';
-  const cuotas = [{n:1,lbl:'1 cuota'},{n:3,lbl:'3 cuotas'},{n:6,lbl:'6 cuotas'},{n:12,lbl:'12 cuotas'},{n:18,lbl:'18 cuotas'},{n:24,lbl:'24 cuotas'}];
+  const cuotas = [{n:1,lbl:'1 cuota'},{n:2,lbl:'2 cuotas'},{n:3,lbl:'3 cuotas'},{n:4,lbl:'4 cuotas'},{n:5,lbl:'5 cuotas'},{n:6,lbl:'6 cuotas'}];
   cuotas.forEach(c => {
     const row = document.createElement('div');
     row.className = 'fm-cuota-row';
@@ -1312,13 +1312,14 @@ function buildCuotasInputs(){
 }
 
 function fmtPeso(v){
-  const n = parseFloat(String(v).replace(/[^0-9.]/g,''));
-  if(isNaN(n)) return '';
+  var s = String(v).replace(/\$/g,'').trim().replace(/\./g,'').replace(',','.');
+  var n = parseFloat(s);
+  if(isNaN(n) || !isFinite(n)) return '';
   return '$' + Math.round(n).toLocaleString('es-AR');
 }
 
 function updateFlyerCircle(){
-  const ids = [1,3,6,12,18,24];
+  const ids = [1,2,3,4,5,6];
   const wrap = document.getElementById('flyer-tarifas-wrap');
   if(!wrap) return;
   wrap.innerHTML = '';
@@ -1379,8 +1380,7 @@ function actualizarFlyer(){
   const hospDates = document.getElementById('flyer-hosp-dates');
   if(hospDates){
     if(checkin || checkout){
-      const fmt = function(d){ if(!d) return ''; const p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; };
-      hospDates.textContent = (checkin ? 'Check-in: '+fmt(checkin) : '') + (checkin&&checkout ? ' — ' : '') + (checkout ? 'Check-out: '+fmt(checkout) : '');
+      hospDates.textContent = (checkin ? 'Check-in: '+checkin : '') + (checkin&&checkout ? ' — ' : '') + (checkout ? 'Check-out: '+checkout : '');
     } else {
       hospDates.textContent = '';
     }
@@ -1451,7 +1451,6 @@ function abrirFlyerModal(){
   _flyerDestKey = null;
 
   const destiInput = document.getElementById('f-destino');
-  const hotelInput = document.getElementById('f-hospedaje');
   if(destiInput){
     const key = resolveDestino(destiInput.value || '');
     if(key){ selectDestThumb(key); }
@@ -1460,14 +1459,29 @@ function abrirFlyerModal(){
       if(dm) dm.value = destiInput.value || '';
     }
   }
-  if(hotelInput){
-    const hm = document.getElementById('fm-hotel');
-    if(hm) hm.value = hotelInput.value || '';
-  }
-  const ci = document.getElementById('f-checkin');
-  const co = document.getElementById('f-checkout');
-  if(ci){ const fm=document.getElementById('fm-checkin'); if(fm) fm.value=ci.value||''; }
-  if(co){ const fm=document.getElementById('fm-checkout'); if(fm) fm.value=co.value||''; }
+
+  // Hotel
+  var hospVal = (document.getElementById('f-hosp')||{}).value || '';
+  var hmEl = document.getElementById('fm-hotel');
+  if(hmEl) hmEl.value = hospVal;
+
+  // Vuelos
+  var aeroIda  = (document.getElementById('f-aero-ida')||{}).value || '';
+  var fechaIda = (document.getElementById('f-fecha-ida')||{}).value || '';
+  var aeroVta  = (document.getElementById('f-aero-vuelta')||{}).value || '';
+  var fechaVta = (document.getElementById('f-fecha-vuelta')||{}).value || '';
+  var fmVIda = document.getElementById('fm-vuelo-ida');
+  var fmVVta = document.getElementById('fm-vuelo-vuelta');
+  if(fmVIda) fmVIda.value = [aeroIda, fechaIda].filter(Boolean).join(' · ');
+  if(fmVVta) fmVVta.value = [aeroVta, fechaVta].filter(Boolean).join(' · ');
+
+  // Fechas (texto libre)
+  var ci = (document.getElementById('f-checkin')||{}).value || '';
+  var co = (document.getElementById('f-checkout')||{}).value || '';
+  var fmCi = document.getElementById('fm-checkin');
+  var fmCo = document.getElementById('fm-checkout');
+  if(fmCi) fmCi.value = ci;
+  if(fmCo) fmCo.value = co;
 
   // Reset chips
   document.querySelectorAll('#fm-ben-chips .fm-chip').forEach(function(c){
@@ -1494,12 +1508,12 @@ function abrirFlyerModal(){
     }
   });
 
-  if(typeof flyerCuotas !== 'undefined' && flyerCuotas){
-    var map = {1:'fm-c1',3:'fm-c3',6:'fm-c6',12:'fm-c12',18:'fm-c18',24:'fm-c24'};
-    Object.keys(flyerCuotas).forEach(function(k){
-      const el = document.getElementById(map[k]);
-      if(el && flyerCuotas[k]) el.value = flyerCuotas[k];
-    });
+  // Cuotas desde lastCuotas[] (global definido en calcFiscal)
+  if(typeof lastCuotas !== 'undefined' && Array.isArray(lastCuotas) && lastCuotas.length){
+    for(var i = 0; i < Math.min(lastCuotas.length, 6); i++){
+      var el = document.getElementById('fm-c' + (i + 1));
+      if(el && lastCuotas[i]) el.value = lastCuotas[i];
+    }
   }
 
   setTimeout(function(){ actualizarFlyer(); syncPreview(); }, 60);
