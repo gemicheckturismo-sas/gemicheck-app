@@ -43,7 +43,7 @@ body{font-family:'Inter',sans-serif;background:var(--gris);color:var(--txt);min-
 .tab.active{color:var(--az);border-bottom-color:var(--az)}
 
 /* CONTENT */
-.content{padding:20px;max-width:1100px;margin:0 auto}
+.content{padding:20px;max-width:1200px;margin:0 auto}
 
 /* CARDS */
 .card{background:#fff;border-radius:14px;padding:20px;box-shadow:var(--sombra);margin-bottom:16px}
@@ -70,11 +70,6 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 .total-bar{background:var(--az);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
 .total-lbl{font-size:11px;color:rgba(255,255,255,.7);font-weight:600;text-transform:uppercase}
 .total-num{font-family:'Montserrat',sans-serif;font-weight:800;font-size:20px;color:#fff}
-
-/* CUOTAS */
-.cuota-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:.5px solid var(--gris2)}
-.cuota-row:last-child{border:none}
-.cuota-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;color:var(--az)}
 
 /* BUTTONS */
 .btn{padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.15s}
@@ -127,11 +122,52 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 .estado-btn.canc{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
 .estado-btn.activo{box-shadow:0 0 0 2px currentColor}
 
+/* COTIZAR LAYOUT */
+.cotizar-grid{display:grid;grid-template-columns:1fr 400px;gap:16px}
+
+/* FISCAL TABLE */
+.fiscal-wrap{overflow-x:auto;margin-top:4px}
+.fiscal-table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}
+.fiscal-table th{background:var(--az);color:#fff;padding:8px 10px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;white-space:nowrap;letter-spacing:.3px}
+.fiscal-table th:first-child{text-align:center}
+.fiscal-table td{padding:8px 10px;text-align:right;border-bottom:.5px solid var(--gris2);font-variant-numeric:tabular-nums;color:var(--txt)}
+.fiscal-table td:first-child{text-align:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;color:var(--az)}
+.fiscal-table tr:last-child td{border-bottom:none}
+.fiscal-table tr:hover td{background:var(--az3)}
+.fiscal-table .col-pv{font-family:'Montserrat',sans-serif;font-weight:700}
+.fiscal-table .col-queda{font-weight:600;color:var(--vrd)}
+
+/* MARGEN PILL */
+.pill-margen{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin-left:5px;vertical-align:middle}
+.pill-green{background:#d1fae5;color:#065f46}
+.pill-yellow{background:#fef3c7;color:#92400e}
+.pill-red{background:#fee2e2;color:#991b1b}
+
+/* RECARGO GRID */
+.recargo-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.recargo-cell{text-align:center}
+.recargo-cell label{font-size:10px;color:var(--mut);font-weight:700;text-transform:uppercase;display:block;margin-bottom:3px}
+.recargo-cell input{width:100%;padding:6px 2px;border:1.5px solid var(--gris2);border-radius:6px;font-size:12px;text-align:center;font-family:'Inter',sans-serif;color:var(--txt)}
+.recargo-cell input:focus{outline:none;border-color:var(--az2)}
+
+/* PROVINCIA ROWS */
+.prov-row{display:grid;grid-template-columns:1fr 56px 24px;gap:6px;align-items:center;margin-bottom:6px}
+.prov-row input{padding:7px 8px;border:1.5px solid var(--gris2);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;color:var(--txt);width:100%}
+.prov-row input:focus{outline:none;border-color:var(--az2)}
+
+/* TASAS */
+.tasa-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tasa-item label{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px}
+.tasa-item input{width:100%;padding:8px 10px;border:1.5px solid var(--gris2);border-radius:7px;font-size:14px;text-align:center;font-family:'Montserrat',sans-serif;font-weight:700;color:var(--az)}
+.tasa-item input:focus{outline:none;border-color:var(--az2)}
+
+@media(max-width:960px){.cotizar-grid{grid-template-columns:1fr}}
 @media(max-width:640px){
   .grid-2,.grid-3{grid-template-columns:1fr}
   .item-row,.col-hds{grid-template-columns:100px 1fr 70px 80px 24px}
   .hist-grid{grid-template-columns:1fr}
   .content{padding:12px}
+  .recargo-grid{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
@@ -169,17 +205,18 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 
   <!-- TAB: COTIZAR -->
   <div id="tab-cotizar" class="content">
-    <div style="display:grid;grid-template-columns:1fr 380px;gap:16px">
+    <div class="cotizar-grid">
     <div>
 
       <!-- CLIENTE -->
       <div class="card">
         <div class="card-title">Cliente y destino</div>
-        <div class="grid-2">
-          <div><label class="lbl">Nombre cliente</label><input class="inp" id="f-nombre" placeholder="Familia García" oninput="actualizarCuotas()"></div>
+        <div class="grid-3">
+          <div><label class="lbl">Nombre cliente</label><input class="inp" id="f-nombre" placeholder="Familia García" oninput="calcFiscal()"></div>
+          <div><label class="lbl">Destino</label><input class="inp" type="text" id="f-destino" placeholder="Bariloche, Florianópolis, Cancún..." oninput="calcFiscal()"></div>
           <div>
-            <label class="lbl">Destino</label>
-            <input class="inp" type="text" id="f-destino" placeholder="Ej: Bariloche, Florianópolis, Cancún..." oninput="actualizarCuotas()">
+            <label class="lbl">Provincia (IIBB)</label>
+            <select class="inp" id="f-provincia" onchange="calcFiscal()"></select>
           </div>
         </div>
         <div class="grid-3">
@@ -217,7 +254,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
         <div class="mb12">
           <label class="lbl">Link Airbnb / Booking</label>
           <div class="link-row">
-            <input class="inp" id="f-link" placeholder="https://airbnb.com/rooms/...">
+            <input class="inp" id="f-link" placeholder="https://airbnb.com/rooms/..." oninput="calcFiscal()">
             <a id="link-abrir" href="#" target="_blank" style="display:none">Abrir →</a>
           </div>
         </div>
@@ -227,10 +264,10 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
       <div class="card">
         <div class="card-title">Extras opcionales</div>
         <div class="check-grid">
-          <label class="check-lbl"><input type="checkbox" id="ex-traslado" onchange="actualizarCuotas()"> Traslado ida y vuelta</label>
-          <label class="check-lbl"><input type="checkbox" id="ex-auto" onchange="actualizarCuotas()"> Auto / alquiler</label>
-          <label class="check-lbl"><input type="checkbox" id="ex-excursion" onchange="toggleExc();actualizarCuotas()"> Excursiones</label>
-          <label class="check-lbl"><input type="checkbox" id="ex-seguro" onchange="actualizarCuotas()"> Seguro de viaje</label>
+          <label class="check-lbl"><input type="checkbox" id="ex-traslado"> Traslado ida y vuelta</label>
+          <label class="check-lbl"><input type="checkbox" id="ex-auto"> Auto / alquiler</label>
+          <label class="check-lbl"><input type="checkbox" id="ex-excursion" onchange="toggleExc()"> Excursiones</label>
+          <label class="check-lbl"><input type="checkbox" id="ex-seguro"> Seguro de viaje</label>
         </div>
         <div id="exc-detalle" style="display:none">
           <label class="lbl">Detalle excursión</label>
@@ -243,7 +280,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
         <div class="card-title">Costos del paquete</div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <label class="lbl" style="margin:0">TC del día:</label>
-          <input class="inp" type="number" id="tc" value="1550" style="width:90px" oninput="actualizarCuotas()">
+          <input class="inp" type="number" id="tc" value="1550" style="width:90px" oninput="calcFiscal()">
           <span style="font-size:11px;color:var(--mut)">ARS por USD</span>
         </div>
         <div class="col-hds">
@@ -251,16 +288,39 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
           <span class="col-hd">Moneda</span><span class="col-hd" style="text-align:right">En ARS</span><span></span>
         </div>
         <div id="items-container"></div>
-        <button class="btn btn-out btn-sm" onclick="addItem()" style="margin-top:8px">+ Agregar item</button>
+        <button class="btn btn-out btn-sm" onclick="addItem()" style="margin-top:8px">+ Agregar ítem</button>
         <div class="total-bar">
-          <span class="total-lbl">Total paquete</span>
+          <span class="total-lbl">Costo total paquete</span>
           <span class="total-num" id="total-num">$0</span>
+        </div>
+      </div>
+
+      <!-- DESGLOSE FISCAL -->
+      <div class="card">
+        <div class="card-title">Desglose fiscal por cuota</div>
+        <div class="fiscal-wrap">
+          <table class="fiscal-table">
+            <thead>
+              <tr>
+                <th style="text-align:center">C</th>
+                <th>PV total</th>
+                <th>Cuota/mes</th>
+                <th>Comisión fc</th>
+                <th>Base ÷1.21</th>
+                <th>IVA → ARCA</th>
+                <th>IIBB</th>
+                <th>IDCB</th>
+                <th>Te queda real</th>
+              </tr>
+            </thead>
+            <tbody id="fiscal-tbody"></tbody>
+          </table>
         </div>
       </div>
 
       <div class="btn-row">
         <button class="btn btn-prim" onclick="guardar()">Guardar cotización</button>
-        <button class="btn btn-out" onclick="copiarCuotas()">Copiar cuotas WhatsApp</button>
+        <button class="btn btn-out" onclick="copiarWSP()">Copiar cuotas WhatsApp</button>
         <button class="btn btn-out" onclick="limpiar()">Nueva</button>
       </div>
 
@@ -268,21 +328,54 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 
     <!-- PANEL DERECHO -->
     <div>
+
+      <!-- TASAS -->
       <div class="card">
-        <div class="card-title">Opciones de pago</div>
-        <div id="cuotas-lista"></div>
-        <div style="margin-top:12px">
-          <div style="font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;margin-bottom:4px">Para WhatsApp</div>
-          <div class="wsp-box" id="wsp-text"></div>
-          <button class="btn btn-out btn-sm" onclick="copiarCuotas()" style="margin-top:8px">Copiar</button>
+        <div class="card-title">Tasas impositivas</div>
+        <div class="tasa-row">
+          <div class="tasa-item">
+            <label>IVA (%)</label>
+            <input type="number" id="t-iva" value="21" step="0.1" min="0" oninput="calcFiscal()">
+          </div>
+          <div class="tasa-item">
+            <label>IDCB (%)</label>
+            <input type="number" id="t-idcb" value="0.6" step="0.01" min="0" oninput="calcFiscal()">
+          </div>
         </div>
+        <div style="font-size:10px;color:var(--mut);margin-top:8px">IVA va dentro de la factura (base = comisión ÷ 1+IVA). IDCB se aplica sobre PV total.</div>
       </div>
 
+      <!-- RECARGOS -->
       <div class="card">
-        <div class="card-title">Texto completo WhatsApp</div>
-        <div class="wsp-box" id="wsp-completo"></div>
-        <button class="btn btn-out btn-sm" onclick="copiarCompleto()" style="margin-top:8px">Copiar mensaje completo</button>
+        <div class="card-title">Recargos por cuota (%)</div>
+        <div class="recargo-grid" id="recargo-grid"></div>
+        <div style="font-size:10px;color:var(--mut);margin-top:8px">PV = costo × (1 + recargo). Editables por sesión.</div>
       </div>
+
+      <!-- PROVINCIAS -->
+      <div class="card">
+        <div class="card-title">Provincias — IIBB</div>
+        <div style="display:grid;grid-template-columns:1fr 56px 24px;gap:6px;margin-bottom:6px">
+          <span style="font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase">Provincia</span>
+          <span style="font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;text-align:center">IIBB %</span>
+          <span></span>
+        </div>
+        <div id="provincias-lista"></div>
+        <button class="btn btn-out btn-sm" onclick="addProvincia()" style="margin-top:10px">+ Nueva provincia</button>
+        <div style="font-size:10px;color:var(--mut);margin-top:8px">IIBB = base imponible × %. Editables por sesión.</div>
+      </div>
+
+      <!-- WHATSAPP -->
+      <div class="card">
+        <div class="card-title">Para WhatsApp</div>
+        <div style="font-size:10px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Opciones de pago</div>
+        <div class="wsp-box" id="wsp-text"></div>
+        <button class="btn btn-out btn-sm" onclick="copiarWSP()" style="margin-top:8px">Copiar cuotas</button>
+        <div style="font-size:10px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:14px;margin-bottom:2px">Mensaje completo</div>
+        <div class="wsp-box" id="wsp-completo"></div>
+        <button class="btn btn-out btn-sm" onclick="copiarCompleto()" style="margin-top:8px">Copiar mensaje</button>
+      </div>
+
     </div>
     </div>
   </div>
@@ -321,23 +414,29 @@ const SUPA_KEY = 'sb_publishable_xBsIZcKDUdgrxAGjiKAykQ_3xD9H1yD';
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 
-const CUOTAS_ADMIN = [{n:1,p:1.06},{n:2,p:1.10},{n:3,p:1.20},{n:4,p:1.28},{n:5,p:1.34},{n:6,p:1.42}];
-const CUOTAS_VEND = [{n:1,p:1.10},{n:2,p:1.16},{n:3,p:1.23},{n:4,p:1.32},{n:5,p:1.40},{n:6,p:1.48}];
-function getCuotas(){ return currentRole==='admin' ? CUOTAS_ADMIN : CUOTAS_VEND; }
-let itemCount = 0, estadoActual = 'pendiente', cotizacionId = null, historialData = [], filtroEstado = 'todos';
+// Recargos por cuota (%) — editables en pantalla, solo en sesión
+let recargos = [6, 20, 28, 34, 42, 49];
+
+// Provincias con IIBB — editables en pantalla, solo en sesión
+let provincias = [
+  {nombre: 'CABA',          iibb: 6},
+  {nombre: 'Buenos Aires',  iibb: 8},
+  {nombre: 'Córdoba',       iibb: 6},
+];
+
+let itemCount = 0, estadoActual = 'pendiente', cotizacionId = null;
+let historialData = [], filtroEstado = 'todos';
 let currentUser = null, currentRole = null;
 
-function fmt(n){return '$'+Math.round(n).toLocaleString('es-AR')}
+function fmt(n){ return '$' + Math.round(n).toLocaleString('es-AR'); }
+function escHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 // AUTH
 async function doLogin(){
   const email = document.getElementById('login-email').value;
-  const pass = document.getElementById('login-pass').value;
-  const {data,error} = await db.auth.signInWithPassword({email,password:pass});
-  if(error){
-    document.getElementById('login-err').style.display='block';
-    return;
-  }
+  const pass  = document.getElementById('login-pass').value;
+  const {data, error} = await db.auth.signInWithPassword({email, password: pass});
+  if(error){ document.getElementById('login-err').style.display = 'block'; return; }
   currentUser = data.user;
   await loadUserProfile();
   showApp();
@@ -353,35 +452,37 @@ async function loadUserProfile(){
 
 async function doLogout(){
   await db.auth.signOut();
-  document.getElementById('app-screen').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
   currentUser = null; currentRole = null;
 }
 
 function showApp(){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app-screen').style.display='block';
-  addItem('Vuelo','','ARS');
-  addItem('Hospedaje','','USD');
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  renderProvincias();
+  renderRecargoGrid();
+  addItem('Vuelo', '', 'ARS');
+  addItem('Hospedaje', '', 'USD');
   cargarHistorial();
 }
 
 // TABS
 function showTab(id, el){
-  ['cotizar','historial','clientes'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display='none';
+  ['cotizar','historial','clientes'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = 'none';
   });
-  document.getElementById('tab-'+id).style.display='block';
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).style.display = 'block';
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  if(id==='historial') renderHistorial();
-  if(id==='clientes') renderClientes();
+  if(id === 'historial') renderHistorial();
+  if(id === 'clientes')  renderClientes();
 }
 
 // ESTADO
 function setEstado(estado, el){
   estadoActual = estado;
-  document.querySelectorAll('.estado-btn').forEach(b=>b.classList.remove('activo'));
+  document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('activo'));
   el.classList.add('activo');
 }
 
@@ -390,26 +491,27 @@ function addItem(concepto='', monto='', moneda='ARS'){
   const id = itemCount++;
   const container = document.getElementById('items-container');
   const div = document.createElement('div');
-  div.className = 'item-row'; div.id = 'item-'+id;
+  div.className = 'item-row';
+  div.id = 'item-' + id;
   const conceptos = ['Vuelo','Hospedaje','Traslado','Auto','Excursión','Seguro','Otro'];
-  const opts = conceptos.map(c=>`<option ${c===concepto?'selected':''}>${c}</option>`).join('');
+  const opts = conceptos.map(c => `<option ${c===concepto?'selected':''}>${c}</option>`).join('');
   div.innerHTML = `
-    <select class="inp" onchange="actualizarCuotas()" style="padding:7px 6px;font-size:12px"><option value="">—</option>${opts}</select>
-    <input class="inp" type="number" placeholder="Monto" value="${monto}" style="font-size:13px" oninput="actualizarCuotas()">
-    <select class="inp" onchange="actualizarCuotas()" style="padding:7px 6px;font-size:12px">
+    <select class="inp" onchange="calcFiscal()" style="padding:7px 6px;font-size:12px"><option value="">—</option>${opts}</select>
+    <input class="inp" type="number" placeholder="Monto" value="${monto}" style="font-size:13px" oninput="calcFiscal()">
+    <select class="inp" onchange="calcFiscal()" style="padding:7px 6px;font-size:12px">
       <option value="ARS" ${moneda==='ARS'?'selected':''}>ARS</option>
       <option value="USD" ${moneda==='USD'?'selected':''}>USD</option>
     </select>
     <span class="en-ars" id="ars-${id}">—</span>
     <button class="btn-x" onclick="delItem(${id})">×</button>`;
   container.appendChild(div);
-  actualizarCuotas();
+  calcFiscal();
 }
 
 function delItem(id){
   const el = document.getElementById('item-'+id);
   if(el) el.remove();
-  actualizarCuotas();
+  calcFiscal();
 }
 
 function toggleExc(){
@@ -417,126 +519,237 @@ function toggleExc(){
   document.getElementById('exc-detalle').style.display = cb.checked ? 'block' : 'none';
 }
 
-function actualizarCuotas(){
-  const tc = parseFloat(document.getElementById('tc').value)||1550;
-  let total = 0;
-  document.querySelectorAll('.item-row').forEach(fila=>{
-    const inputs = fila.querySelectorAll('input[type=number]');
-    const sels = fila.querySelectorAll('select');
-    if(!inputs.length||sels.length<2) return;
-    const monto = parseFloat(inputs[0].value)||0;
+// RECARGOS — renderiza los 6 inputs editables
+function renderRecargoGrid(){
+  const grid = document.getElementById('recargo-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  recargos.forEach((r, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'recargo-cell';
+    cell.innerHTML = `<label>${i+1}c</label><input type="number" value="${r}" step="0.5" min="0" oninput="recargos[${i}]=parseFloat(this.value)||0;calcFiscal()">`;
+    grid.appendChild(cell);
+  });
+}
+
+// PROVINCIAS — renderiza el select (cliente card) y la lista editable (panel derecho)
+function renderProvincias(){
+  const sel = document.getElementById('f-provincia');
+  if(sel){
+    const prevIdx = parseInt(sel.value) || 0;
+    sel.innerHTML = provincias.map((p, i) =>
+      `<option value="${i}">${escHtml(p.nombre)} — ${p.iibb}%</option>`
+    ).join('');
+    sel.value = Math.min(prevIdx, provincias.length - 1);
+  }
+
+  const lista = document.getElementById('provincias-lista');
+  if(!lista) return;
+  lista.innerHTML = '';
+  provincias.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'prov-row';
+    row.innerHTML = `
+      <input type="text" value="${escHtml(p.nombre)}" placeholder="Provincia"
+        oninput="provincias[${i}].nombre=this.value;syncProvSel()">
+      <input type="number" value="${p.iibb}" step="0.1" min="0" placeholder="%"
+        style="text-align:center" oninput="provincias[${i}].iibb=parseFloat(this.value)||0;calcFiscal()">
+      <button class="btn-x" onclick="deleteProvincia(${i})" title="Eliminar">×</button>`;
+    lista.appendChild(row);
+  });
+}
+
+// Actualiza solo el select cuando se edita el nombre (sin re-renderizar la lista)
+function syncProvSel(){
+  const sel = document.getElementById('f-provincia');
+  if(!sel) return;
+  const idx = parseInt(sel.value) || 0;
+  sel.innerHTML = provincias.map((p, i) =>
+    `<option value="${i}">${escHtml(p.nombre)} — ${p.iibb}%</option>`
+  ).join('');
+  sel.value = Math.min(idx, provincias.length - 1);
+}
+
+function addProvincia(){
+  provincias.push({nombre: 'Nueva', iibb: 5});
+  renderProvincias();
+  calcFiscal();
+}
+
+function deleteProvincia(i){
+  if(provincias.length <= 1){ notif('Necesitás al menos una provincia','err'); return; }
+  provincias.splice(i, 1);
+  renderProvincias();
+  calcFiscal();
+}
+
+// CÁLCULO FISCAL — fuente de verdad de todos los números
+function calcFiscal(){
+  const tc = parseFloat(document.getElementById('tc').value) || 1550;
+  let costo = 0;
+
+  // Sumar ítems y actualizar columna ARS
+  document.querySelectorAll('.item-row').forEach(fila => {
+    const numInputs = fila.querySelectorAll('input[type=number]');
+    const sels     = fila.querySelectorAll('select');
+    if(!numInputs.length || sels.length < 2) return;
+    const monto  = parseFloat(numInputs[0].value) || 0;
     const moneda = sels[1].value;
-    const enARS = moneda==='USD' ? monto*tc : monto;
-    total += enARS;
+    const enARS  = moneda === 'USD' ? monto * tc : monto;
+    costo += enARS;
     const span = fila.querySelector('.en-ars');
-    if(span){ span.textContent = monto>0 ? fmt(enARS) : '—'; span.style.color = moneda==='USD' ? '#1a56c4' : 'var(--mut)'; }
+    if(span){
+      span.textContent  = monto > 0 ? fmt(enARS) : '—';
+      span.style.color  = moneda === 'USD' ? '#1a56c4' : 'var(--mut)';
+    }
   });
 
-  document.getElementById('total-num').textContent = fmt(total);
+  document.getElementById('total-num').textContent = fmt(costo);
 
-  // Link abrir
+  // Link hospedaje
   const linkVal = document.getElementById('f-link').value;
-  const linkEl = document.getElementById('link-abrir');
+  const linkEl  = document.getElementById('link-abrir');
   if(linkVal && linkVal.startsWith('http')){
     linkEl.href = linkVal; linkEl.style.display = 'inline';
   } else { linkEl.style.display = 'none'; }
 
-  // Cuotas
-  const lista = document.getElementById('cuotas-lista');
-  lista.innerHTML = '';
-  let lineas = [];
-  getCuotas().forEach(c=>{
-    const tot = Math.round(total*c.p);
-    const pc = Math.round(tot/c.n);
-    const lbl = c.n===1 ? '1 pago' : `${c.n} pagos`;
-    const intLbl = c.n===1 ? '' : `+${Math.round((c.p-1)*100)}%`;
-    const div = document.createElement('div');
-    div.className = 'cuota-row';
-    div.innerHTML = `<span style="font-size:13px;color:var(--txt)">${lbl}</span><span style="font-size:11px;color:var(--mut)">${intLbl}</span><span class="cuota-val" style="font-size:${c.n===1?'16':'14'}px">${fmt(pc)}</span>`;
-    lista.appendChild(div);
-    lineas.push(`${lbl} de ${fmt(pc)}`);
+  // Tasas
+  const ivaRate  = (parseFloat(document.getElementById('t-iva').value)  || 21)  / 100;
+  const idcbRate = (parseFloat(document.getElementById('t-idcb').value) || 0.6) / 100;
+
+  // IIBB de la provincia seleccionada
+  const provIdx  = parseInt(document.getElementById('f-provincia').value) || 0;
+  const prov     = provincias[provIdx] || provincias[0];
+  const iibbRate = ((prov ? prov.iibb : 0)) / 100;
+
+  // Construir tabla fiscal y líneas de WhatsApp
+  const tbody    = document.getElementById('fiscal-tbody');
+  tbody.innerHTML = '';
+  const wspLines = [];
+
+  recargos.forEach((recargoPct, i) => {
+    const n       = i + 1;
+    const recargo = recargoPct / 100;
+
+    // Fórmulas en orden
+    const PV       = costo * (1 + recargo);
+    const cuotaMes = PV / n;
+    const comision = PV - costo;
+    const base     = comision > 0 ? comision / (1 + ivaRate) : 0;  // IVA incluido
+    const iva      = comision - base;
+    const iibb     = base * iibbRate;
+    const idcb     = PV * idcbRate;
+    const teQueda  = base - iibb - idcb;
+    const margen   = costo > 0 ? (teQueda / costo) * 100 : 0;
+
+    const pillCls = margen >= 10 ? 'pill-green' : margen >= 5 ? 'pill-yellow' : 'pill-red';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${n}</td>
+      <td class="col-pv">${fmt(PV)}</td>
+      <td>${n > 1 ? fmt(cuotaMes) : '—'}</td>
+      <td>${fmt(comision)}</td>
+      <td>${fmt(base)}</td>
+      <td>${fmt(iva)}</td>
+      <td>${fmt(iibb)}</td>
+      <td>${fmt(idcb)}</td>
+      <td class="col-queda">${fmt(teQueda)}<span class="pill-margen ${pillCls}">${margen.toFixed(1)}%</span></td>`;
+    tbody.appendChild(tr);
+
+    wspLines.push(n === 1 ? `1 pago: ${fmt(PV)}` : `${n} cuotas de ${fmt(cuotaMes)}`);
   });
 
-  document.getElementById('wsp-text').textContent = lineas.join('\n');
-
-  // WSP se actualiza via actualizarWSP()
+  // WhatsApp
+  document.getElementById('wsp-text').textContent = wspLines.join('\n');
+  buildWSPCompleto(wspLines);
 }
 
-function actualizarWSP(){
-  const lineas = [];
-  getCuotas().forEach((c,i)=>{
-    const input = document.getElementById('cuota-input-'+i);
-    if(!input) return;
-    const val = parseInt(input.value)||0;
-    const lbl = c.n===1?'1 pago':`${c.n} pagos`;
-    if(val>0) lineas.push(`${lbl} de ${fmt(val)}`);
-  });
-  const wspText = lineas.join('\n');
-  const wspEl = document.getElementById('wsp-text');
-  if(wspEl) wspEl.textContent = wspText;
+function buildWSPCompleto(wspLines){
+  const nombre    = document.getElementById('f-nombre').value    || '';
+  const destino   = document.getElementById('f-destino').value   || '';
+  const pax       = document.getElementById('f-pax').value       || '';
+  const checkin   = document.getElementById('f-checkin').value   || '';
+  const checkout  = document.getElementById('f-checkout').value  || '';
+  const aeroIda   = document.getElementById('f-aero-ida').value  || '';
+  const fechaIda  = document.getElementById('f-fecha-ida').value || '';
+  const aeroVuelta  = document.getElementById('f-aero-vuelta').value  || '';
+  const fechaVuelta = document.getElementById('f-fecha-vuelta').value || '';
+  const hosp = document.getElementById('f-hosp').value || '';
 
-  // Texto completo
-  const nombre = document.getElementById('f-nombre').value||'';
-  const pax = document.getElementById('f-pax').value;
-  const checkin = document.getElementById('f-checkin').value;
-  const checkout = document.getElementById('f-checkout').value;
-  const aeroIda = document.getElementById('f-aero-ida').value;
-  const fechaIda = document.getElementById('f-fecha-ida').value;
-  const aeroVuelta = document.getElementById('f-aero-vuelta').value;
-  const fechaVuelta = document.getElementById('f-fecha-vuelta').value;
-  const hosp = document.getElementById('f-hosp').value;
-  let completo = '';
-  if(aeroIda&&fechaIda) completo+=`Ida ${aeroIda} - ${fechaIda}\n`;
-  if(aeroVuelta&&fechaVuelta) completo+=`Vuelta ${aeroVuelta} - ${fechaVuelta}\n`;
-  if(hosp) completo+=`Hospedaje: ${hosp}`;
-  if(checkin&&checkout) completo+=` (${checkin} al ${checkout})`;
-  if(hosp||checkin) completo+='\n';
-  if(pax) completo+=`${pax}\n`;
-  completo+='\n'+wspText;
+  let msg = '';
+  if(nombre)  msg += `Cotización para ${nombre}\n`;
+  if(destino){
+    msg += `Destino: ${destino}`;
+    if(checkin && checkout) msg += ` (${checkin} al ${checkout})`;
+    msg += '\n';
+  }
+  if(aeroIda   && fechaIda)   msg += `Ida: ${aeroIda} - ${fechaIda}\n`;
+  if(aeroVuelta && fechaVuelta) msg += `Vuelta: ${aeroVuelta} - ${fechaVuelta}\n`;
+  if(hosp) msg += `Hospedaje: ${hosp}\n`;
+  if(pax)  msg += `${pax}\n`;
+  msg += '\nOpciones de pago:\n' + wspLines.join('\n');
+
   const wc = document.getElementById('wsp-completo');
-  if(wc) wc.textContent=completo;
+  if(wc) wc.textContent = msg;
 }
 
 // GUARDAR
 async function guardar(){
   if(!currentUser){ notif('Debés iniciar sesión', 'err'); return; }
-  const tc = parseFloat(document.getElementById('tc').value)||1550;
+
+  const tc = parseFloat(document.getElementById('tc').value) || 1550;
   let total = 0;
   const items = [];
-  document.querySelectorAll('.item-row').forEach(fila=>{
-    const inputs = fila.querySelectorAll('input[type=number]');
-    const sels = fila.querySelectorAll('select');
-    if(!inputs.length||sels.length<2) return;
+
+  document.querySelectorAll('.item-row').forEach(fila => {
+    const numInputs = fila.querySelectorAll('input[type=number]');
+    const sels      = fila.querySelectorAll('select');
+    if(!numInputs.length || sels.length < 2) return;
     const concepto = sels[0].value;
-    const monto = parseFloat(inputs[0].value)||0;
-    const moneda = sels[1].value;
-    const enARS = moneda==='USD' ? monto*tc : monto;
+    const monto    = parseFloat(numInputs[0].value) || 0;
+    const moneda   = sels[1].value;
+    const enARS    = moneda === 'USD' ? monto * tc : monto;
     total += enARS;
-    if(monto>0) items.push({concepto,monto,moneda,enARS});
+    if(monto > 0) items.push({concepto, monto, moneda, enARS});
   });
 
+  // te_queda_real calculado para 1 cuota (escenario más favorable)
+  const ivaRate  = (parseFloat(document.getElementById('t-iva').value)  || 21)  / 100;
+  const idcbRate = (parseFloat(document.getElementById('t-idcb').value) || 0.6) / 100;
+  const provIdx  = parseInt(document.getElementById('f-provincia').value) || 0;
+  const prov     = provincias[provIdx] || provincias[0];
+  const iibbRate = ((prov ? prov.iibb : 0)) / 100;
+  const PV1      = total * (1 + recargos[0] / 100);
+  const com1     = PV1 - total;
+  const base1    = com1 > 0 ? com1 / (1 + ivaRate) : 0;
+  const teQuedaReal = Math.round(base1 - (base1 * iibbRate) - (PV1 * idcbRate));
+
   const payload = {
-    user_id: currentUser.id,
-    nombre: document.getElementById('f-nombre').value||'Sin nombre',
-    destino: document.getElementById('f-destino').value,
-    pasajeros: document.getElementById('f-pax').value,
-    checkin: document.getElementById('f-checkin').value,
-    checkout: document.getElementById('f-checkout').value,
-    aero_ida: document.getElementById('f-aero-ida').value,
-    fecha_ida: document.getElementById('f-fecha-ida').value,
-    aero_vuelta: document.getElementById('f-aero-vuelta').value,
-    fecha_vuelta: document.getElementById('f-fecha-vuelta').value,
-    hospedaje: document.getElementById('f-hosp').value,
-    link_hospedaje: document.getElementById('f-link').value,
-    notas: document.getElementById('f-notas').value,
-    estado: estadoActual,
-    tc, total,
-    items: JSON.stringify(items),
-    extra_traslado: document.getElementById('ex-traslado').checked,
-    extra_auto: document.getElementById('ex-auto').checked,
-    extra_excursion: document.getElementById('ex-excursion').checked,
-    extra_seguro: document.getElementById('ex-seguro').checked,
+    user_id:          currentUser.id,
+    nombre:           document.getElementById('f-nombre').value   || 'Sin nombre',
+    destino:          document.getElementById('f-destino').value,
+    pasajeros:        document.getElementById('f-pax').value,
+    checkin:          document.getElementById('f-checkin').value,
+    checkout:         document.getElementById('f-checkout').value,
+    aero_ida:         document.getElementById('f-aero-ida').value,
+    fecha_ida:        document.getElementById('f-fecha-ida').value,
+    aero_vuelta:      document.getElementById('f-aero-vuelta').value,
+    fecha_vuelta:     document.getElementById('f-fecha-vuelta').value,
+    hospedaje:        document.getElementById('f-hosp').value,
+    link_hospedaje:   document.getElementById('f-link').value,
+    notas:            document.getElementById('f-notas').value,
+    estado:           estadoActual,
+    tc,
+    total,
+    items:            JSON.stringify(items),
+    extra_traslado:   document.getElementById('ex-traslado').checked,
+    extra_auto:       document.getElementById('ex-auto').checked,
+    extra_excursion:  document.getElementById('ex-excursion').checked,
+    extra_seguro:     document.getElementById('ex-seguro').checked,
     excursion_detalle: document.getElementById('f-excursion').value,
+    provincia:        prov ? prov.nombre : '',
+    te_queda_real:    teQuedaReal,
   };
 
   let result;
@@ -546,18 +759,16 @@ async function guardar(){
     result = await db.from('cotizaciones').insert(payload);
   }
 
-  if(result.error){ notif('Error al guardar: '+result.error.message,'err'); return; }
+  if(result.error){ notif('Error al guardar: ' + result.error.message, 'err'); return; }
   notif('Cotización guardada');
   await cargarHistorial();
 }
 
 // HISTORIAL
 async function cargarHistorial(){
-  let query = db.from('cotizaciones').select('*').order('created_at',{ascending:false});
-  if(currentRole !== 'admin'){
-    query = query.eq('user_id', currentUser.id);
-  }
-  const {data,error} = await query;
+  let query = db.from('cotizaciones').select('*').order('created_at', {ascending: false});
+  if(currentRole !== 'admin') query = query.eq('user_id', currentUser.id);
+  const {data, error} = await query;
   if(!error) historialData = data || [];
 }
 
@@ -567,29 +778,31 @@ function filtrarHist(estado){
 }
 
 function renderHistorial(){
-  const buscar = (document.getElementById('buscar-hist').value||'').toLowerCase();
-  const grid = document.getElementById('historial-grid');
-  let datos = historialData;
-  if(filtroEstado!=='todos') datos = datos.filter(c=>c.estado===filtroEstado);
-  if(buscar) datos = datos.filter(c=>(c.nombre||'').toLowerCase().includes(buscar));
-  if(!datos.length){ grid.innerHTML='<p style="color:var(--mut);font-size:13px">Sin cotizaciones</p>'; return; }
+  const buscar = (document.getElementById('buscar-hist').value || '').toLowerCase();
+  const grid   = document.getElementById('historial-grid');
+  let datos    = historialData;
+  if(filtroEstado !== 'todos') datos = datos.filter(c => c.estado === filtroEstado);
+  if(buscar) datos = datos.filter(c => (c.nombre || '').toLowerCase().includes(buscar));
+  if(!datos.length){ grid.innerHTML = '<p style="color:var(--mut);font-size:13px">Sin cotizaciones</p>'; return; }
 
   grid.innerHTML = '';
-  datos.forEach(c=>{
+  datos.forEach(c => {
     const badgeClass = c.estado==='confirmado'?'conf':c.estado==='cancelado'?'canc':'pend';
     const badgeLabel = c.estado==='confirmado'?'Confirmado':c.estado==='cancelado'?'Cancelado':'Pendiente';
     const fecha = new Date(c.created_at).toLocaleDateString('es-AR');
     const el = document.createElement('div');
     el.className = 'hist-card';
     el.innerHTML = `
-      <div class="hist-nombre">${c.nombre}</div>
-      <div class="hist-dest">${c.destino} · ${c.checkin||'—'} → ${c.checkout||'—'}</div>
+      <div class="hist-nombre">${escHtml(c.nombre)}</div>
+      <div class="hist-dest">${escHtml(c.destino||'')} · ${c.checkin||'—'} → ${c.checkout||'—'}</div>
       <div class="hist-precio">${fmt(c.total)}</div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span class="badge badge-${badgeClass}">${badgeLabel}</span>
         <span class="hist-fecha">${fecha}</span>
       </div>
-      ${c.link_hospedaje ? `<div style="margin-top:6px"><a href="${c.link_hospedaje}" target="_blank" style="font-size:12px;color:var(--az2);font-weight:600">Ver hospedaje →</a></div>` : ''}
+      ${c.provincia ? `<div style="font-size:11px;color:var(--mut);margin-top:4px">${escHtml(c.provincia)}</div>` : ''}
+      ${c.te_queda_real ? `<div style="font-size:11px;color:var(--vrd);font-weight:600;margin-top:2px">Real 1c: ${fmt(c.te_queda_real)}</div>` : ''}
+      ${c.link_hospedaje ? `<div style="margin-top:6px"><a href="${escHtml(c.link_hospedaje)}" target="_blank" style="font-size:12px;color:var(--az2);font-weight:600">Ver hospedaje →</a></div>` : ''}
       <div class="hist-actions">
         <button class="btn btn-out btn-sm" onclick='cargarCotizacion(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Editar</button>
         <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;border:none;font-weight:600" onclick="cambiarEstado('${c.id}','confirmado')">Confirmar</button>
@@ -601,50 +814,66 @@ function renderHistorial(){
 
 function cargarCotizacion(c){
   cotizacionId = c.id;
-  document.getElementById('f-nombre').value = c.nombre||'';
-  document.getElementById('f-destino').value = c.destino||'Bariloche';
-  document.getElementById('f-pax').value = c.pasajeros||'';
-  document.getElementById('f-checkin').value = c.checkin||'';
-  document.getElementById('f-checkout').value = c.checkout||'';
-  document.getElementById('f-aero-ida').value = c.aero_ida||'';
-  document.getElementById('f-fecha-ida').value = c.fecha_ida||'';
-  document.getElementById('f-aero-vuelta').value = c.aero_vuelta||'';
-  document.getElementById('f-fecha-vuelta').value = c.fecha_vuelta||'';
-  document.getElementById('f-hosp').value = c.hospedaje||'';
-  document.getElementById('f-link').value = c.link_hospedaje||'';
-  document.getElementById('f-notas').value = c.notas||'';
-  document.getElementById('tc').value = c.tc||1550;
-  document.getElementById('ex-traslado').checked = c.extra_traslado||false;
-  document.getElementById('ex-auto').checked = c.extra_auto||false;
-  document.getElementById('ex-excursion').checked = c.extra_excursion||false;
-  document.getElementById('ex-seguro').checked = c.extra_seguro||false;
-  document.getElementById('f-excursion').value = c.excursion_detalle||'';
-  if(c.extra_excursion) document.getElementById('exc-detalle').style.display='block';
+  document.getElementById('f-nombre').value       = c.nombre           || '';
+  document.getElementById('f-destino').value      = c.destino          || '';
+  document.getElementById('f-pax').value          = c.pasajeros        || '';
+  document.getElementById('f-checkin').value      = c.checkin          || '';
+  document.getElementById('f-checkout').value     = c.checkout         || '';
+  document.getElementById('f-aero-ida').value     = c.aero_ida         || '';
+  document.getElementById('f-fecha-ida').value    = c.fecha_ida        || '';
+  document.getElementById('f-aero-vuelta').value  = c.aero_vuelta      || '';
+  document.getElementById('f-fecha-vuelta').value = c.fecha_vuelta     || '';
+  document.getElementById('f-hosp').value         = c.hospedaje        || '';
+  document.getElementById('f-link').value         = c.link_hospedaje   || '';
+  document.getElementById('f-notas').value        = c.notas            || '';
+  document.getElementById('tc').value             = c.tc               || 1550;
+  document.getElementById('ex-traslado').checked  = c.extra_traslado   || false;
+  document.getElementById('ex-auto').checked      = c.extra_auto       || false;
+  document.getElementById('ex-excursion').checked = c.extra_excursion  || false;
+  document.getElementById('ex-seguro').checked    = c.extra_seguro     || false;
+  document.getElementById('f-excursion').value    = c.excursion_detalle || '';
+  if(c.extra_excursion) document.getElementById('exc-detalle').style.display = 'block';
 
-  document.getElementById('items-container').innerHTML=''; itemCount=0;
-  if(c.items){
-    const items = JSON.parse(c.items);
-    items.forEach(it=>addItem(it.concepto, it.monto, it.moneda));
+  // Restaurar provincia
+  if(c.provincia){
+    const sel = document.getElementById('f-provincia');
+    const idx = provincias.findIndex(p => p.nombre === c.provincia);
+    if(idx >= 0) sel.value = idx;
   }
-  estadoActual = c.estado||'pendiente';
-  document.querySelectorAll('.estado-btn').forEach(b=>b.classList.remove('activo'));
-  document.querySelector(`.estado-btn.${estadoActual==='confirmado'?'conf':estadoActual==='cancelado'?'canc':'pend'}`).classList.add('activo');
+
+  // Restaurar ítems
+  document.getElementById('items-container').innerHTML = '';
+  itemCount = 0;
+  if(c.items){
+    try {
+      const parsed = JSON.parse(c.items);
+      parsed.forEach(it => addItem(it.concepto, it.monto, it.moneda));
+    } catch(e){}
+  }
+  if(!document.querySelectorAll('.item-row').length){
+    addItem('Vuelo','','ARS'); addItem('Hospedaje','','USD');
+  }
+
+  estadoActual = c.estado || 'pendiente';
+  document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('activo'));
+  const btnClass = estadoActual==='confirmado'?'conf':estadoActual==='cancelado'?'canc':'pend';
+  document.querySelector(`.estado-btn.${btnClass}`).classList.add('activo');
 
   showTab('cotizar', document.querySelector('.tab'));
   document.querySelector('.tab').classList.add('active');
-  actualizarCuotas();
+  calcFiscal();
   notif('Cotización cargada');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
 async function cambiarEstado(id, estado){
-  const {error} = await db.from('cotizaciones').update({estado}).eq('id',id);
+  const {error} = await db.from('cotizaciones').update({estado}).eq('id', id);
   if(!error){ await cargarHistorial(); renderHistorial(); notif('Estado actualizado'); }
 }
 
 async function eliminar(id){
   if(!confirm('¿Eliminar esta cotización?')) return;
-  await db.from('cotizaciones').delete().eq('id',id);
+  await db.from('cotizaciones').delete().eq('id', id);
   await cargarHistorial(); renderHistorial();
   notif('Eliminada');
 }
@@ -652,26 +881,26 @@ async function eliminar(id){
 // CLIENTES
 async function renderClientes(){
   const {data} = await db.from('cotizaciones').select('nombre,destino,total,estado,created_at').order('nombre');
-  if(!data){ return; }
+  if(!data) return;
   const agrupado = {};
-  data.forEach(c=>{
-    if(!agrupado[c.nombre]) agrupado[c.nombre]={cotizaciones:[],total:0};
+  data.forEach(c => {
+    if(!agrupado[c.nombre]) agrupado[c.nombre] = {cotizaciones: [], total: 0};
     agrupado[c.nombre].cotizaciones.push(c);
-    if(c.estado==='confirmado') agrupado[c.nombre].total+=c.total;
+    if(c.estado === 'confirmado') agrupado[c.nombre].total += c.total;
   });
   const div = document.getElementById('clientes-lista');
   div.innerHTML = '';
-  Object.entries(agrupado).forEach(([nombre,data])=>{
+  Object.entries(agrupado).forEach(([nombre, info]) => {
     const el = document.createElement('div');
-    el.style.cssText='padding:12px 0;border-bottom:.5px solid var(--gris2)';
-    el.innerHTML=`
+    el.style.cssText = 'padding:12px 0;border-bottom:.5px solid var(--gris2)';
+    el.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
-          <div style="font-weight:600;font-size:14px">${nombre}</div>
-          <div style="font-size:12px;color:var(--mut)">${data.cotizaciones.length} cotización${data.cotizaciones.length>1?'es':''}</div>
+          <div style="font-weight:600;font-size:14px">${escHtml(nombre)}</div>
+          <div style="font-size:12px;color:var(--mut)">${info.cotizaciones.length} cotización${info.cotizaciones.length>1?'es':''}</div>
         </div>
         <div style="text-align:right">
-          <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:var(--az)">${fmt(data.total)}</div>
+          <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:var(--az)">${fmt(info.total)}</div>
           <div style="font-size:11px;color:var(--mut)">confirmado</div>
         </div>
       </div>`;
@@ -680,41 +909,48 @@ async function renderClientes(){
 }
 
 function limpiar(){
-  cotizacionId=null;
-  ['f-nombre','f-pax','f-checkin','f-checkout','f-aero-ida','f-fecha-ida','f-aero-vuelta','f-fecha-vuelta','f-hosp','f-link','f-notas','f-excursion'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
+  cotizacionId = null;
+  ['f-nombre','f-pax','f-checkin','f-checkout','f-aero-ida','f-fecha-ida',
+   'f-aero-vuelta','f-fecha-vuelta','f-hosp','f-link','f-notas','f-excursion'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
   });
-  ['ex-traslado','ex-auto','ex-excursion','ex-seguro'].forEach(id=>{
-    document.getElementById(id).checked=false;
+  ['ex-traslado','ex-auto','ex-excursion','ex-seguro'].forEach(id => {
+    document.getElementById(id).checked = false;
   });
-  document.getElementById('exc-detalle').style.display='none';
-  document.getElementById('items-container').innerHTML=''; itemCount=0;
-  estadoActual='pendiente';
-  document.querySelectorAll('.estado-btn').forEach(b=>b.classList.remove('activo'));
+  document.getElementById('exc-detalle').style.display = 'none';
+  document.getElementById('f-provincia').value = '0';
+  document.getElementById('items-container').innerHTML = '';
+  itemCount = 0;
+  estadoActual = 'pendiente';
+  document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('activo'));
   document.querySelector('.estado-btn.pend').classList.add('activo');
-  addItem('Vuelo','','ARS'); addItem('Hospedaje','','USD');
-  actualizarCuotas();
+  addItem('Vuelo', '', 'ARS');
+  addItem('Hospedaje', '', 'USD');
+  calcFiscal();
   notif('Lista para nueva cotización');
 }
 
-function copiarCuotas(){
-  navigator.clipboard.writeText(document.getElementById('wsp-text').textContent).then(()=>notif('Cuotas copiadas'));
+function copiarWSP(){
+  navigator.clipboard.writeText(document.getElementById('wsp-text').textContent)
+    .then(() => notif('Cuotas copiadas'));
 }
 function copiarCompleto(){
-  navigator.clipboard.writeText(document.getElementById('wsp-completo').textContent).then(()=>notif('Mensaje copiado'));
+  navigator.clipboard.writeText(document.getElementById('wsp-completo').textContent)
+    .then(() => notif('Mensaje copiado'));
 }
 
-function notif(msg,tipo='ok'){
-  const n=document.getElementById('notif');
-  n.textContent=msg; n.className=`notif notif-${tipo} show`;
-  setTimeout(()=>n.classList.remove('show'),2500);
+function notif(msg, tipo='ok'){
+  const n = document.getElementById('notif');
+  n.textContent  = msg;
+  n.className    = `notif notif-${tipo} show`;
+  setTimeout(() => n.classList.remove('show'), 2500);
 }
 
-// Init
-db.auth.getSession().then(({data})=>{
+// Init: restaurar sesión existente
+db.auth.getSession().then(({data}) => {
   if(data.session){
-    currentUser=data.session.user;
-    loadUserProfile().then(()=>{showApp()});
+    currentUser = data.session.user;
+    loadUserProfile().then(() => showApp());
   }
 });
 </script>
