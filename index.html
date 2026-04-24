@@ -488,6 +488,10 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
         <div class="fm-section">
           <div class="fm-section-title">Destino</div>
           <div class="fm-dest-grid" id="fm-dest-grid"></div>
+          <div style="margin-top:6px">
+            <label>O subir foto propia</label>
+            <input type="file" id="fm-foto-propia" accept="image/*" onchange="flyerFotoPropia(this)">
+          </div>
           <div>
             <label>Nombre en flyer</label>
             <input type="text" id="fm-destino" placeholder="ej: Bariloche" oninput="actualizarFlyer()">
@@ -585,7 +589,7 @@ Actividades opcionales</textarea>
     <div id="flyer-tarifas-wrap" style="display:flex;flex-direction:column;align-items:center;gap:4px"></div>
   </div>
   <div class="flyer-strip">
-    <div class="flyer-tagline">VIAJÁ FELIZ <span class="flyer-tagline-acc">✈</span> GEMICHECK</div>
+    <div class="flyer-tagline">¿<span class="flyer-tagline-acc">FANÁTICOS?</span> DE VERTE FELIZ</div>
   </div>
 </div>
 <script>
@@ -1183,6 +1187,20 @@ function resolveDestino(str){
 }
 
 let _flyerDestKey = null;
+let _flyerCustomBg = null;
+
+function flyerFotoPropia(input){
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    _flyerCustomBg = e.target.result;
+    _flyerDestKey = '__custom__';
+    document.querySelectorAll('.fm-dest-thumb').forEach(t => t.classList.remove('sel'));
+    setFlyerBg(e.target.result);
+    actualizarFlyer();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
 
 function buildDestGrid(){
   const grid = document.getElementById('fm-dest-grid');
@@ -1360,19 +1378,12 @@ function syncPreview(){
   const src = document.getElementById('flyer-div');
   const dst = document.getElementById('preview-inner');
   if(!src || !dst) return;
-  const clone = src.cloneNode(true);
-  clone.style.cssText = src.style.cssText;
-  clone.style.position = 'absolute';
-  clone.style.left = '0';
-  clone.style.top = '0';
-  clone.removeAttribute('id');
   const dstW = dst.offsetWidth || 270;
   const dstH = dst.offsetHeight || 338;
   const sc = Math.min(dstW / 1080, dstH / 1350);
-  clone.style.transform = 'scale(' + sc + ')';
-  clone.style.transformOrigin = 'top left';
-  clone.style.width = '1080px';
-  clone.style.height = '1350px';
+  const clone = src.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1350px;overflow:hidden;font-family:Montserrat,sans-serif;transform:scale(' + sc + ');transform-origin:top left;pointer-events:none';
   dst.innerHTML = '';
   dst.appendChild(clone);
 }
@@ -1440,11 +1451,8 @@ async function descargarFlyer(){
     await document.fonts.ready;
     const src = document.getElementById('flyer-div');
     const clone = src.cloneNode(true);
-    clone.style.cssText = src.style.cssText;
-    clone.style.position = 'absolute';
-    clone.style.left = '-9999px';
-    clone.style.top = '0';
     clone.removeAttribute('id');
+    clone.style.cssText = 'position:absolute;left:-9999px;top:0;width:1080px;height:1350px;overflow:hidden;font-family:Montserrat,sans-serif';
 
     const bgImg = clone.querySelector('.flyer-bg-img');
     const origBgImg = src.querySelector('.flyer-bg-img');
@@ -1465,7 +1473,7 @@ async function descargarFlyer(){
     const canvas = await html2canvas(clone, {
       width: 1080, height: 1350, scale: 2,
       useCORS: true, allowTaint: false,
-      backgroundColor: null, logging: false
+      backgroundColor: '#001a4d', logging: false
     });
     document.body.removeChild(clone);
 
