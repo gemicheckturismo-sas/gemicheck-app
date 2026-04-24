@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Gemicheck — Cotizador</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -169,6 +170,64 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
   .content{padding:12px}
   .recargo-grid{grid-template-columns:repeat(3,1fr)}
 }
+
+/* ── FLYER MODAL ── */
+.flyer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:500;display:flex;align-items:stretch;overflow:hidden}
+.flyer-left{width:340px;flex-shrink:0;background:#1a1f2e;padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.flyer-right{flex:1;display:flex;align-items:center;justify-content:center;background:#111;overflow:hidden}
+.flyer-close-bar{display:flex;justify-content:space-between;align-items:center}
+.flyer-close-bar span{font-family:Montserrat,sans-serif;font-weight:800;font-size:12px;color:#fff;letter-spacing:1.5px}
+.fm-section{background:rgba(255,255,255,.06);border-radius:10px;padding:12px}
+.fm-ttl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.45);margin-bottom:8px}
+.fm-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.55);display:block;margin-bottom:3px;margin-top:6px}
+.fm-lbl:first-of-type{margin-top:0}
+.fm-inp{width:100%;padding:7px 9px;border:1.5px solid rgba(255,255,255,.14);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;color:#fff;background:rgba(255,255,255,.08);margin-bottom:0}
+.fm-inp:focus{outline:none;border-color:#1a56c4}
+.fm-cuotas{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fm-cuota-cell{text-align:center}
+.fm-cuota-cell label{font-size:10px;color:rgba(255,255,255,.45);font-weight:700;text-transform:uppercase;display:block;margin-bottom:2px}
+.fm-cuota-cell input{width:100%;padding:6px 4px;border:1.5px solid rgba(255,255,255,.14);border-radius:6px;font-size:11px;text-align:center;font-family:'Inter',sans-serif;color:#fff;background:rgba(255,255,255,.08)}
+.fm-cuota-cell input:focus{outline:none;border-color:#1a56c4}
+.fm-ben-row{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+.fm-ben-row input{flex:1;padding:6px 8px;border:1.5px solid rgba(255,255,255,.14);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;color:#fff;background:rgba(255,255,255,.08)}
+.fm-ben-row input:focus{outline:none;border-color:#1a56c4}
+.fm-btn-del{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:17px;padding:0 4px;line-height:1;flex-shrink:0}
+.fm-btn-del:hover{color:#e24b4a}
+.fm-dest-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+.fm-dest-thumb{cursor:pointer;border-radius:7px;overflow:hidden;border:2px solid transparent;transition:.15s}
+.fm-dest-thumb:hover{border-color:#1a56c4}
+.fm-dest-thumb.sel{border-color:#5ba8ff}
+.fm-dest-thumb img{width:100%;height:54px;object-fit:cover;display:block}
+.fm-dest-thumb span{display:block;font-size:9px;color:rgba(255,255,255,.75);text-align:center;padding:3px 2px;background:rgba(0,0,0,.55)}
+.preview-wrap{transform-origin:center center;flex-shrink:0}
+/* ── FLYER DIV (off-screen source, 1080×1350) ── */
+#flyer-div{position:fixed;left:-9999px;top:0;width:1080px;height:1350px;font-family:'Inter',sans-serif;overflow:hidden;background:#003580}
+.flyer-bg{position:absolute;inset:0;background:#003580;background-size:cover;background-position:center}
+.flyer-ovl{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.52) 0%,rgba(0,0,0,.28) 45%,rgba(0,0,0,.74) 100%)}
+.flyer-content{position:absolute;inset:0;display:flex;flex-direction:column;padding:58px 64px 112px}
+.flyer-logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:44px;color:#fff;letter-spacing:5px;text-align:center;margin-bottom:30px}
+.flyer-pre{font-size:30px;font-weight:700;color:rgba(255,255,255,.78);letter-spacing:5px;text-transform:uppercase;line-height:1;margin-bottom:4px}
+.flyer-dest{font-family:'Dancing Script',cursive;font-weight:700;font-size:88px;color:#5ba8ff;line-height:1.08;margin-bottom:18px}
+.flyer-sep{height:2px;width:110px;background:#5ba8ff;border-radius:2px;margin-bottom:24px}
+.flyer-sec-lbl{font-size:16px;font-weight:700;color:rgba(255,255,255,.52);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px}
+.flyer-vuelo-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px}
+.flyer-vuelo-icon{font-size:20px;margin-top:2px}
+.flyer-vuelo-txt{font-size:20px;color:#fff;font-weight:500;line-height:1.35}
+.flyer-hosp-txt{font-size:21px;color:#fff;font-weight:500}
+.flyer-sec-sep{height:1px;background:rgba(255,255,255,.15);margin:18px 0}
+.flyer-ben-list{list-style:none;padding:0;margin:0}
+.flyer-ben-item{display:flex;align-items:center;gap:12px;font-size:19px;color:#fff;font-weight:500;margin-bottom:9px}
+.flyer-ben-dot{width:8px;height:8px;border-radius:50%;background:#5ba8ff;flex-shrink:0}
+.flyer-circle{position:absolute;right:62px;bottom:100px;width:334px;height:334px;border-radius:50%;background:#003580;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 32px;box-shadow:0 0 0 5px rgba(91,168,255,.22)}
+.flyer-circle-ttl{font-size:13px;font-weight:700;color:rgba(255,255,255,.62);text-transform:uppercase;letter-spacing:2px;text-align:center;margin-bottom:12px}
+.flyer-cuota-rows{width:100%}
+.flyer-cuota-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:.5px solid rgba(255,255,255,.11)}
+.flyer-cuota-row:last-child{border-bottom:none}
+.flyer-cuota-lbl{font-size:13px;color:rgba(255,255,255,.62)}
+.flyer-cuota-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:17px;color:#fff}
+.flyer-tagline{position:absolute;bottom:0;left:0;right:0;height:88px;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center}
+.flyer-tagline-txt{font-family:'Montserrat',sans-serif;font-weight:900;font-size:26px;color:#fff;letter-spacing:4px;text-transform:uppercase;text-align:center}
+.flyer-tagline-acc{color:#5ba8ff}
 </style>
 </head>
 <body>
@@ -320,6 +379,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 
       <div class="btn-row">
         <button class="btn btn-prim" onclick="guardar()">Guardar cotización</button>
+        <button class="btn btn-out" onclick="abrirFlyerModal()">Generar flyer</button>
         <button class="btn btn-out" onclick="copiarWSP()">Copiar cuotas WhatsApp</button>
         <button class="btn btn-out" onclick="limpiar()">Nueva</button>
       </div>
@@ -407,6 +467,87 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 </div>
 
 <div class="notif" id="notif"></div>
+
+<!-- FLYER MODAL -->
+<div id="flyer-modal" class="flyer-overlay" style="display:none">
+  <div class="flyer-left">
+    <div class="flyer-close-bar">
+      <span>GENERAR FLYER</span>
+      <button class="btn btn-danger btn-sm" onclick="cerrarFlyerModal()">✕ Cerrar</button>
+    </div>
+
+    <div class="fm-section">
+      <div class="fm-ttl">Destino en el flyer</div>
+      <input class="fm-inp" id="fm-destino" placeholder="BARILOCHE" oninput="actualizarFlyer()">
+      <div class="fm-ttl" style="margin-top:10px">Foto preset</div>
+      <div class="fm-dest-grid" id="fm-dest-grid"></div>
+      <label class="fm-lbl">O subir foto propia</label>
+      <input type="file" id="fm-foto-upload" accept="image/*" style="font-size:11px;color:rgba(255,255,255,.6);width:100%;margin-top:4px" onchange="handleFotoUpload(this)">
+    </div>
+
+    <div class="fm-section">
+      <div class="fm-ttl">Vuelos</div>
+      <label class="fm-lbl">Aerolínea ida</label>
+      <input class="fm-inp" id="fm-vuelo-ida-aero" placeholder="Jetsmart" oninput="actualizarFlyer()">
+      <label class="fm-lbl">Fecha / horario ida</label>
+      <input class="fm-inp" id="fm-vuelo-ida-fecha" placeholder="Mié 15/07 · EZE 07:45 → BRC 10:10" oninput="actualizarFlyer()">
+      <label class="fm-lbl">Aerolínea vuelta</label>
+      <input class="fm-inp" id="fm-vuelo-vuelta-aero" placeholder="Aerolíneas" oninput="actualizarFlyer()">
+      <label class="fm-lbl">Fecha / horario vuelta</label>
+      <input class="fm-inp" id="fm-vuelo-vuelta-fecha" placeholder="Lun 21/07 · BRC 19:03 → AEP 21:08" oninput="actualizarFlyer()">
+    </div>
+
+    <div class="fm-section">
+      <div class="fm-ttl">Hospedaje</div>
+      <input class="fm-inp" id="fm-hosp" placeholder="Cómodo monoambiente urbano" oninput="actualizarFlyer()">
+    </div>
+
+    <div class="fm-section">
+      <div class="fm-ttl">Beneficios incluidos</div>
+      <div id="fm-beneficios-lista"></div>
+      <button class="btn btn-sm" onclick="addBeneficioFlyer()" style="width:100%;margin-top:8px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.65);border:1.5px solid rgba(255,255,255,.18)">+ Beneficio</button>
+    </div>
+
+    <div class="fm-section">
+      <div class="fm-ttl">Tarifas en el círculo</div>
+      <div class="fm-cuotas" id="fm-cuotas-grid"></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:8px">Pre-llenadas del cotizador. Editables para redondear.</div>
+    </div>
+
+    <button class="btn btn-ok" onclick="descargarFlyer()" style="width:100%;padding:13px;font-size:14px;font-weight:700;font-family:Montserrat,sans-serif;letter-spacing:.5px">⬇ Descargar PNG 1080×1350</button>
+  </div>
+
+  <div class="flyer-right" id="flyer-right">
+    <div class="preview-wrap" id="preview-wrap"></div>
+  </div>
+</div>
+
+<!-- FLYER SOURCE (off-screen, 1080×1350) -->
+<div id="flyer-div">
+  <div class="flyer-bg" id="flyer-bg"></div>
+  <div class="flyer-ovl"></div>
+  <div class="flyer-content">
+    <div class="flyer-logo">GEMICHECK</div>
+    <div class="flyer-pre">NOS VAMOS A</div>
+    <div class="flyer-dest" id="flyer-dest-txt">Destino</div>
+    <div class="flyer-sep"></div>
+    <div class="flyer-sec-lbl">✈ Vuelos</div>
+    <div id="flyer-vuelos-wrap"></div>
+    <div class="flyer-sec-sep"></div>
+    <div class="flyer-sec-lbl">🏨 Hospedaje</div>
+    <div class="flyer-hosp-txt" id="flyer-hosp-wrap"></div>
+    <div class="flyer-sec-sep"></div>
+    <div class="flyer-sec-lbl">✅ Incluye</div>
+    <ul class="flyer-ben-list" id="flyer-ben-wrap"></ul>
+  </div>
+  <div class="flyer-circle">
+    <div class="flyer-circle-ttl">OPCIONES DE PAGO</div>
+    <div class="flyer-cuota-rows" id="flyer-tarifas-wrap"></div>
+  </div>
+  <div class="flyer-tagline">
+    <div class="flyer-tagline-txt">¿<span class="flyer-tagline-acc">FANÁTICOS</span>? DE VERTE FELIZ</div>
+  </div>
+</div>
 
 <script>
 const SUPA_URL = 'https://iflpflvalueurrajuubp.supabase.co';
@@ -626,6 +767,7 @@ function calcFiscal(){
   const tbody    = document.getElementById('fiscal-tbody');
   tbody.innerHTML = '';
   const wspLines = [];
+  lastCuotas = [];
 
   recargos.forEach((recargoPct, i) => {
     const n       = i + 1;
@@ -657,6 +799,7 @@ function calcFiscal(){
       <td class="col-queda">${fmt(teQueda)}<span class="pill-margen ${pillCls}">${margen.toFixed(1)}%</span></td>`;
     tbody.appendChild(tr);
 
+    lastCuotas.push(n === 1 ? fmt(PV) : fmt(cuotaMes));
     wspLines.push(n === 1 ? `1 pago: ${fmt(PV)}` : `${n} cuotas de ${fmt(cuotaMes)}`);
   });
 
@@ -805,6 +948,7 @@ function renderHistorial(){
       ${c.link_hospedaje ? `<div style="margin-top:6px"><a href="${escHtml(c.link_hospedaje)}" target="_blank" style="font-size:12px;color:var(--az2);font-weight:600">Ver hospedaje →</a></div>` : ''}
       <div class="hist-actions">
         <button class="btn btn-out btn-sm" onclick='cargarCotizacion(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Editar</button>
+        <button class="btn btn-sm" style="background:#e8f0fd;color:#003580;border:none;font-weight:600" onclick='abrirFlyerDesdeHist(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Flyer</button>
         <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;border:none;font-weight:600" onclick="cambiarEstado('${c.id}','confirmado')">Confirmar</button>
         <button class="btn btn-danger btn-sm" onclick="eliminar('${c.id}')">Eliminar</button>
       </div>`;
@@ -953,6 +1097,280 @@ db.auth.getSession().then(({data}) => {
     loadUserProfile().then(() => showApp());
   }
 });
+
+// ═══════════════════════════════════════════
+// FLYER GENERATOR
+// ═══════════════════════════════════════════
+let lastCuotas = [];
+let flyerBeneficios = ['Vuelos incluidos', 'Hospedaje incluido', 'Asistencia 24hs'];
+let flyerFotoSrc = null;
+
+const DESTINO_MAP = {
+  'bariloche':   'assets/destinos/bariloche.jpg',
+  'mendoza':     'assets/destinos/mendoza.jpg',
+  'salta':       'assets/destinos/salta.jpg',
+  'iguazu':      'assets/destinos/iguazu.jpg',
+  'cancun':      'assets/destinos/cancun.jpg',
+  'miami':       'assets/destinos/miami.jpg',
+  'punta-cana':  'assets/destinos/punta-cana.jpg',
+  'ushuaia':     'assets/destinos/ushuaia.jpg',
+};
+
+const DESTINO_LABELS = {
+  'bariloche':'Bariloche','mendoza':'Mendoza','salta':'Salta','iguazu':'Iguazú',
+  'cancun':'Cancún','miami':'Miami','punta-cana':'Punta Cana','ushuaia':'Ushuaia',
+};
+
+const DESTINO_ALIAS = {
+  'bariloche':'bariloche','brc':'bariloche','villa la angostura':'bariloche','cerro catedral':'bariloche',
+  'mendoza':'mendoza','mdz':'mendoza','valle de uco':'mendoza',
+  'salta':'salta','jujuy':'salta','purmamarca':'salta','tilcara':'salta','cafayate':'salta',
+  'iguazu':'iguazu','cataratas':'iguazu','foz':'iguazu','puerto iguazu':'iguazu',
+  'cancun':'cancun','riviera maya':'cancun','playa del carmen':'cancun','tulum':'cancun',
+  'miami':'miami','orlando':'miami','florida':'miami',
+  'punta cana':'punta-cana','bavaro':'punta-cana','bávaro':'punta-cana','republica dominicana':'punta-cana',
+  'ushuaia':'ushuaia','tierra del fuego':'ushuaia','patagonia':'ushuaia',
+};
+
+function normStr(s){ return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
+
+function matchDestinoKey(text){
+  const n = normStr(text);
+  if(DESTINO_ALIAS[n]) return DESTINO_ALIAS[n];
+  for(const [alias, key] of Object.entries(DESTINO_ALIAS)){
+    if(n.includes(alias) || alias.includes(n)) return key;
+  }
+  return null;
+}
+
+async function imgToDataUrl(src){
+  try{
+    const res = await fetch(src);
+    const blob = await res.blob();
+    return await new Promise(resolve => {
+      const r = new FileReader();
+      r.onload = e => resolve(e.target.result);
+      r.readAsDataURL(blob);
+    });
+  } catch(e){ return null; }
+}
+
+function abrirFlyerModal(){
+  const destino = document.getElementById('f-destino').value || '';
+  document.getElementById('fm-destino').value            = destino.split(',')[0].trim().toUpperCase();
+  document.getElementById('fm-vuelo-ida-aero').value     = document.getElementById('f-aero-ida').value     || '';
+  document.getElementById('fm-vuelo-ida-fecha').value    = document.getElementById('f-fecha-ida').value    || '';
+  document.getElementById('fm-vuelo-vuelta-aero').value  = document.getElementById('f-aero-vuelta').value  || '';
+  document.getElementById('fm-vuelo-vuelta-fecha').value = document.getElementById('f-fecha-vuelta').value || '';
+  document.getElementById('fm-hosp').value               = document.getElementById('f-hosp').value         || '';
+  renderDestinoThumbs();
+  renderBeneficiosModal();
+  renderFlyerCuotas();
+  document.getElementById('flyer-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  const key = matchDestinoKey(destino);
+  if(key) setFlyerPhoto(key);
+  else actualizarFlyer();
+}
+
+function cerrarFlyerModal(){
+  document.getElementById('flyer-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderDestinoThumbs(){
+  const grid = document.getElementById('fm-dest-grid');
+  grid.innerHTML = '';
+  Object.entries(DESTINO_MAP).forEach(([key, src]) => {
+    const div = document.createElement('div');
+    div.className = 'fm-dest-thumb';
+    div.id = 'thumb-' + key;
+    div.onclick = () => setFlyerPhoto(key);
+    div.innerHTML = `<img src="${src}" alt="${DESTINO_LABELS[key]}" onerror="this.style.display='none'"><span>${DESTINO_LABELS[key]}</span>`;
+    grid.appendChild(div);
+  });
+}
+
+async function setFlyerPhoto(key){
+  document.querySelectorAll('.fm-dest-thumb').forEach(t => t.classList.remove('sel'));
+  const thumb = document.getElementById('thumb-' + key);
+  if(thumb) thumb.classList.add('sel');
+  const fmDest = document.getElementById('fm-destino');
+  const allUpperLabels = Object.values(DESTINO_LABELS).map(l => l.toUpperCase());
+  if(!fmDest.value || allUpperLabels.includes(fmDest.value.trim().toUpperCase())){
+    fmDest.value = DESTINO_LABELS[key].toUpperCase();
+  }
+  const dataUrl = await imgToDataUrl(DESTINO_MAP[key]);
+  flyerFotoSrc = dataUrl || null;
+  actualizarFlyer();
+}
+
+function handleFotoUpload(input){
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    flyerFotoSrc = e.target.result;
+    document.querySelectorAll('.fm-dest-thumb').forEach(t => t.classList.remove('sel'));
+    actualizarFlyer();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function actualizarFlyer(){
+  const destino      = document.getElementById('fm-destino').value || 'Destino';
+  const vIdaAero     = document.getElementById('fm-vuelo-ida-aero').value   || '';
+  const vIdaFecha    = document.getElementById('fm-vuelo-ida-fecha').value  || '';
+  const vVueltaAero  = document.getElementById('fm-vuelo-vuelta-aero').value  || '';
+  const vVueltaFecha = document.getElementById('fm-vuelo-vuelta-fecha').value || '';
+  const hosp         = document.getElementById('fm-hosp').value || '';
+
+  document.getElementById('flyer-dest-txt').textContent = destino;
+  document.getElementById('flyer-hosp-wrap').textContent = hosp;
+
+  const bg = document.getElementById('flyer-bg');
+  if(flyerFotoSrc){
+    bg.style.backgroundImage = `url('${flyerFotoSrc}')`;
+    bg.style.background = '';
+  } else {
+    bg.style.backgroundImage = 'none';
+    bg.style.background = 'linear-gradient(135deg,#001a4d,#003580)';
+  }
+
+  document.getElementById('flyer-vuelos-wrap').innerHTML =
+    buildVueloHTML(vIdaAero, vIdaFecha, '↗') +
+    buildVueloHTML(vVueltaAero, vVueltaFecha, '↙');
+
+  document.getElementById('flyer-ben-wrap').innerHTML = flyerBeneficios
+    .filter(b => b.trim())
+    .map(b => `<li class="flyer-ben-item"><div class="flyer-ben-dot"></div>${escHtml(b)}</li>`)
+    .join('');
+
+  updateFlyerCircle();
+  syncPreview();
+}
+
+function buildVueloHTML(aero, fecha, icon){
+  if(!aero && !fecha) return '';
+  const txt = [aero, fecha].filter(Boolean).join(' · ');
+  return `<div class="flyer-vuelo-row"><div class="flyer-vuelo-icon">${icon}</div><div class="flyer-vuelo-txt">${escHtml(txt)}</div></div>`;
+}
+
+function updateFlyerCircle(){
+  const inputs = document.querySelectorAll('#fm-cuotas-grid .fm-cuota-cell input');
+  let html = '';
+  inputs.forEach((inp, i) => {
+    const val = inp.value.trim();
+    if(!val) return;
+    html += `<div class="flyer-cuota-row"><span class="flyer-cuota-lbl">${i === 0 ? '1 pago' : `${i+1} cuotas`}</span><span class="flyer-cuota-val">${escHtml(val)}</span></div>`;
+  });
+  document.getElementById('flyer-tarifas-wrap').innerHTML = html;
+}
+
+function renderFlyerCuotas(){
+  const grid = document.getElementById('fm-cuotas-grid');
+  grid.innerHTML = '';
+  for(let i = 0; i < 6; i++){
+    const cell = document.createElement('div');
+    cell.className = 'fm-cuota-cell';
+    const prefill = lastCuotas[i] || '';
+    cell.innerHTML = `<label>${i+1}c</label><input value="${escHtml(String(prefill))}" placeholder="—" oninput="updateFlyerCircle();syncPreview()">`;
+    grid.appendChild(cell);
+  }
+}
+
+function renderBeneficiosModal(){
+  const lista = document.getElementById('fm-beneficios-lista');
+  lista.innerHTML = '';
+  flyerBeneficios.forEach((b, i) => {
+    const row = document.createElement('div');
+    row.className = 'fm-ben-row';
+    row.innerHTML = `
+      <input value="${escHtml(b)}" placeholder="Beneficio..." oninput="flyerBeneficios[${i}]=this.value;actualizarFlyer()">
+      <button class="fm-btn-del" onclick="deleteBeneficioFlyer(${i})">×</button>`;
+    lista.appendChild(row);
+  });
+}
+
+function addBeneficioFlyer(){
+  flyerBeneficios.push('');
+  renderBeneficiosModal();
+}
+
+function deleteBeneficioFlyer(i){
+  flyerBeneficios.splice(i, 1);
+  renderBeneficiosModal();
+  actualizarFlyer();
+}
+
+function syncPreview(){
+  const flyer = document.getElementById('flyer-div');
+  const wrap  = document.getElementById('preview-wrap');
+  if(!wrap || !flyer) return;
+  const right = document.getElementById('flyer-right');
+  const availW = right.clientWidth  - 48;
+  const availH = right.clientHeight - 48;
+  const scale  = Math.min(availW / 1080, availH / 1350, 0.65);
+
+  const clone = flyer.cloneNode(true);
+  clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+  clone.style.cssText = 'position:static;width:1080px;height:1350px;overflow:hidden;flex-shrink:0';
+  const origBg = document.getElementById('flyer-bg');
+  const cloneBg = clone.querySelector('.flyer-bg');
+  if(origBg && cloneBg) cloneBg.style.backgroundImage = origBg.style.backgroundImage;
+
+  wrap.innerHTML = '';
+  wrap.style.cssText = `width:1080px;height:1350px;transform:scale(${scale});transform-origin:center center;flex-shrink:0`;
+  wrap.appendChild(clone);
+}
+
+async function descargarFlyer(){
+  const cliente = (document.getElementById('f-nombre').value || 'cliente').replace(/\s+/g,'-').toLowerCase();
+  const destino = (document.getElementById('fm-destino').value || 'destino').toLowerCase().replace(/\s+/g,'-');
+  const flyer = document.getElementById('flyer-div');
+  const clone = flyer.cloneNode(true);
+  clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+  clone.style.cssText = 'position:absolute;left:-9999px;top:0;width:1080px;height:1350px;overflow:hidden;font-family:Inter,sans-serif';
+  const cloneBg = clone.querySelector('.flyer-bg');
+  if(cloneBg){
+    if(flyerFotoSrc) cloneBg.style.backgroundImage = `url('${flyerFotoSrc}')`;
+    else { cloneBg.style.backgroundImage = 'none'; cloneBg.style.background = 'linear-gradient(135deg,#001a4d,#003580)'; }
+  }
+  document.body.appendChild(clone);
+  try{
+    await document.fonts.ready;
+    const canvas = await html2canvas(clone, {
+      width:1080, height:1350, scale:1,
+      useCORS:true, allowTaint:false,
+      backgroundColor:'#003580', logging:false,
+    });
+    const link = document.createElement('a');
+    link.download = `flyer-${destino}-${cliente}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    notif('Flyer descargado');
+  } catch(e){
+    notif('Error al generar flyer','err');
+    console.error(e);
+  } finally {
+    document.body.removeChild(clone);
+  }
+}
+
+function abrirFlyerDesdeHist(c){
+  document.getElementById('f-nombre').value       = c.nombre        || '';
+  document.getElementById('f-destino').value      = c.destino       || '';
+  document.getElementById('f-aero-ida').value     = c.aero_ida      || '';
+  document.getElementById('f-fecha-ida').value    = c.fecha_ida     || '';
+  document.getElementById('f-aero-vuelta').value  = c.aero_vuelta   || '';
+  document.getElementById('f-fecha-vuelta').value = c.fecha_vuelta  || '';
+  document.getElementById('f-hosp').value         = c.hospedaje     || '';
+  const total = c.total || 0;
+  lastCuotas = recargos.map((r, i) => {
+    const PV = total * (1 + r/100);
+    return i === 0 ? fmt(PV) : fmt(PV / (i+1));
+  });
+  abrirFlyerModal();
+}
 </script>
 </body>
 </html>
