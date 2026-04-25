@@ -215,38 +215,36 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 .flyer-form-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
 
 /* FLYER DIV */
-#flyer-div{position:fixed;left:-9999px;top:0;width:1080px;height:1350px;overflow:hidden;font-family:'Montserrat',sans-serif}
+#flyer-div{--theme-color:#1E5BA8;--theme-dark:#0e3570;position:fixed;left:-9999px;top:0;width:1080px;height:1350px;overflow:hidden;font-family:'Montserrat',sans-serif}
 .flyer-bg{position:absolute;inset:0;background:#001a4d}
 .flyer-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.70}
 .flyer-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,26,77,.22) 0%,rgba(0,10,40,.60) 60%,rgba(0,5,25,.90) 100%)}
-.flyer-content{position:absolute;inset:0;display:flex;flex-direction:column;padding:52px 72px 680px}
+.flyer-content{position:absolute;inset:0;display:flex;flex-direction:column;padding:52px 72px 580px}
 .flyer-logo-wrap{text-align:center;margin-bottom:24px}
 .flyer-logo-img{width:220px;height:auto;display:block;margin:0 auto}
 .flyer-pre{font-family:'Montserrat',sans-serif;font-size:50px;font-weight:700;color:#fff;text-align:center;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;line-height:1.1}
-.flyer-dest{font-family:'Dancing Script',cursive;font-weight:700;font-size:96px;color:#4A90E2;text-align:center;line-height:1.05;margin-bottom:28px}
+.flyer-dest{font-family:'Dancing Script',cursive;font-weight:700;font-size:96px;color:var(--theme-color);text-align:center;line-height:1.05;margin-bottom:28px}
 .flyer-info-block{display:flex;flex-direction:column;gap:18px}
-.flyer-vuelo-row{display:flex;align-items:flex-start;gap:16px}
+.flyer-vuelo-row{display:flex;align-items:flex-start;gap:16px;justify-content:center}
 .flyer-vuelo-icon{font-size:28px;line-height:1;flex-shrink:0;margin-top:2px}
 .flyer-vuelo-texts{display:flex;flex-direction:column;gap:2px}
-.flyer-vuelo-main{font-size:20px;font-weight:700;color:#fff;letter-spacing:.5px}
+.flyer-vuelo-main{font-size:24px;font-weight:700;color:#fff;letter-spacing:.5px}
 .flyer-vuelo-legs{display:flex;flex-direction:column;gap:4px;margin-top:4px}
 .flyer-vuelo-leg{display:flex;align-items:baseline;gap:8px}
-.flyer-vuelo-dir{font-size:12px;font-weight:700;color:rgba(255,255,255,.5);width:58px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
-.flyer-vuelo-aero{font-size:15px;color:rgba(255,255,255,.85);font-weight:500}
-.flyer-hosp-row{display:flex;align-items:flex-start;gap:16px}
+.flyer-vuelo-dir{font-size:14px;font-weight:700;color:rgba(255,255,255,.5);width:66px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.flyer-vuelo-aero{font-size:18px;color:rgba(255,255,255,.85);font-weight:500}
+.flyer-hosp-row{display:flex;align-items:flex-start;gap:16px;justify-content:center}
 .flyer-hosp-icon{font-size:26px;line-height:1;flex-shrink:0;margin-top:2px}
 .flyer-hosp-texts{display:flex;flex-direction:column;gap:3px}
-.flyer-hosp-txt{font-size:21px;color:#fff;font-weight:600}
-.flyer-hosp-dates{font-size:15px;color:rgba(255,255,255,.65);font-weight:400}
-.flyer-ben-list{display:flex;flex-direction:column;gap:8px}
-.flyer-ben-item{display:flex;align-items:baseline;gap:10px}
-.flyer-ben-check{color:#22c55e;font-size:22px;font-weight:700;flex-shrink:0;line-height:1}
-.flyer-ben-txt{font-size:17px;color:rgba(255,255,255,.88);font-weight:400}
-.flyer-circle{position:absolute;left:50%;transform:translateX(-50%);bottom:88px;width:520px;height:520px;border-radius:50%;background:#003580;border:6px solid #4A90E2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 0 60px rgba(74,144,226,.35)}
+.flyer-hosp-txt{font-size:26px;color:#fff;font-weight:600}
+.flyer-hosp-dates{font-size:18px;color:rgba(255,255,255,.65);font-weight:400}
+.flyer-ben-list{display:flex;flex-direction:column;gap:8px;align-items:center}
+.flyer-ben-item{display:flex;align-items:baseline;gap:10px;justify-content:center}
+.flyer-ben-check{color:#22c55e;font-size:26px;font-weight:700;flex-shrink:0;line-height:1}
+.flyer-ben-txt{font-size:21px;color:rgba(255,255,255,.88);font-weight:400}
+.flyer-circle{position:absolute;right:60px;bottom:88px;width:460px;height:460px;border-radius:50%;background:var(--theme-dark);border:6px solid var(--theme-color);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 0 60px rgba(74,144,226,.35)}
 .flyer-circle-title{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
-.flyer-cuota-block{display:flex;flex-direction:column;align-items:center;gap:1px}
-.flyer-cuota-lbl{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px}
-.flyer-cuota-val{font-family:'Montserrat',sans-serif;font-weight:700;font-size:23px;color:#fff;letter-spacing:.5px}
+.flyer-cuota-line{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:.3px;text-align:center;line-height:1.3}
 .flyer-cuota-sep{width:80px;height:1px;background:rgba(255,255,255,.18);margin:4px 0}
 .flyer-strip{position:absolute;bottom:0;left:0;right:0;height:80px;background:#4A90E2;display:flex;align-items:center;justify-content:center}
 .flyer-tagline{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:4px;text-transform:uppercase}
@@ -563,6 +561,14 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
         <div class="fm-section">
           <div class="fm-section-title">Tarifas (cuotas)</div>
           <div id="fm-cuotas-wrap"></div>
+        </div>
+        <div class="fm-section">
+          <div class="fm-section-title">Color del tema</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <input type="color" id="fm-color-pick" value="#1E5BA8" oninput="flyerColorManual(this.value)" style="width:38px;height:30px;border:none;background:none;cursor:pointer;padding:0;border-radius:4px;flex-shrink:0">
+            <span style="font-size:12px;color:rgba(255,255,255,.5)">Color personalizado</span>
+          </div>
+          <div id="fm-color-swatches" style="display:flex;gap:10px;flex-wrap:wrap"></div>
         </div>
       </div>
       <div class="preview-wrap">
@@ -1199,6 +1205,17 @@ const DESTINO_ALIAS = {
   'san martin':'san-martin','san-martin':'san-martin','san martin de los andes':'san-martin',
   'brasil':'brasil','florianopolis':'brasil','rio':'brasil','buzios':'brasil',
 };
+const DESTINO_COLORS = {
+  'bariloche':          {color:'#1E5BA8', dark:'#0e3570'},
+  'villa-la-angostura': {color:'#1E5BA8', dark:'#0e3570'},
+  'san-martin':         {color:'#1E5BA8', dark:'#0e3570'},
+  'mendoza':            {color:'#6B3FA0', dark:'#3d2460'},
+  'cordoba':            {color:'#2E7D32', dark:'#1a4a1e'},
+  'iguazu':             {color:'#1B7B3F', dark:'#0e4a26'},
+  'salta':              {color:'#B8510A', dark:'#6e3006'},
+  'jujuy':              {color:'#B8510A', dark:'#6e3006'},
+  'brasil':             {color:'#009C3B', dark:'#005c23'},
+};
 
 function normStr(s){
   return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
@@ -1211,6 +1228,58 @@ function resolveDestino(str){
     if(n.includes(k)) return DESTINO_ALIAS[k];
   }
   return null;
+}
+
+function darkenHex(hex){
+  var r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return '#'+[r,g,b].map(function(v){return Math.round(v*0.55).toString(16).padStart(2,'0');}).join('');
+}
+
+function setFlyerTheme(color, dark){
+  var el = document.getElementById('flyer-div');
+  if(!el) return;
+  el.style.setProperty('--theme-color', color);
+  el.style.setProperty('--theme-dark', dark || darkenHex(color));
+  document.querySelectorAll('.fm-swatch').forEach(function(sw){
+    sw.style.borderColor = sw.dataset.color === color ? '#fff' : 'transparent';
+  });
+  syncPreview();
+}
+
+function flyerColorManual(color){
+  setFlyerTheme(color, darkenHex(color));
+  var picker = document.getElementById('fm-color-pick');
+  if(picker) picker.value = color;
+}
+
+function buildColorSwatches(){
+  var swatches = [
+    {color:'#1E5BA8',label:'Azul'},
+    {color:'#6B3FA0',label:'Violeta'},
+    {color:'#2E7D32',label:'Verde'},
+    {color:'#B8510A',label:'Terracota'},
+    {color:'#C2185B',label:'Rosa'},
+    {color:'#F57F17',label:'Dorado'},
+  ];
+  var wrap = document.getElementById('fm-color-swatches');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  swatches.forEach(function(s){
+    var col = document.createElement('div');
+    col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer';
+    var sw = document.createElement('div');
+    sw.className = 'fm-swatch';
+    sw.dataset.color = s.color;
+    sw.title = s.label;
+    sw.style.cssText = 'width:28px;height:28px;border-radius:50%;background:'+s.color+';border:2.5px solid transparent;transition:.15s;flex-shrink:0';
+    sw.onclick = function(){ flyerColorManual(s.color); };
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'font-size:9px;color:rgba(255,255,255,.45);text-align:center;line-height:1;user-select:none';
+    lbl.textContent = s.label;
+    col.appendChild(sw);
+    col.appendChild(lbl);
+    wrap.appendChild(col);
+  });
 }
 
 let _flyerDestKey = null;
@@ -1286,6 +1355,12 @@ async function selectDestThumb(key){
   document.querySelectorAll('.fm-dest-thumb').forEach(t => t.classList.toggle('sel', t.dataset.key===key));
   const inp = document.getElementById('fm-destino');
   if(inp) inp.value = DESTINO_LABELS[key] || key;
+  const tc = DESTINO_COLORS[key];
+  if(tc){
+    const picker = document.getElementById('fm-color-pick');
+    if(picker) picker.value = tc.color;
+    setFlyerTheme(tc.color, tc.dark);
+  }
   actualizarFlyer();
   const prev = document.getElementById('preview-inner');
   if(prev) prev.insertAdjacentHTML('beforeend',
@@ -1347,17 +1422,10 @@ function updateFlyerCircle(){
       sep.className = 'flyer-cuota-sep';
       wrap.appendChild(sep);
     }
-    const block = document.createElement('div');
-    block.className = 'flyer-cuota-block';
-    const lbl = document.createElement('div');
-    lbl.className = 'flyer-cuota-lbl';
-    lbl.textContent = n === 1 ? '1 CUOTA DE' : (n + ' CUOTAS DE');
-    const valEl = document.createElement('div');
-    valEl.className = 'flyer-cuota-val';
-    valEl.textContent = val;
-    block.appendChild(lbl);
-    block.appendChild(valEl);
-    wrap.appendChild(block);
+    const line = document.createElement('div');
+    line.className = 'flyer-cuota-line';
+    line.textContent = (n === 1 ? '1 CUOTA DE ' : (n + ' CUOTAS DE ')) + val;
+    wrap.appendChild(line);
     first = false;
   });
   syncPreview();
@@ -1460,6 +1528,7 @@ async function abrirFlyerModal(){
   if(!modal) return;
   buildDestGrid();
   buildCuotasInputs();
+  buildColorSwatches();
   modal.style.display = 'flex';
   _flyerDestKey = null;
 
@@ -1530,6 +1599,13 @@ async function abrirFlyerModal(){
     }
   }
 
+  // Default theme when no destination matched
+  if(!hasDest){
+    setFlyerTheme('#1E5BA8', '#0e3570');
+    const picker = document.getElementById('fm-color-pick');
+    if(picker) picker.value = '#1E5BA8';
+  }
+
   // Preload logo as dataURL (resolves tainted canvas + crossorigin issues)
   const logoEl = document.querySelector('#flyer-div .flyer-logo-img');
   if(logoEl && !logoEl.src.startsWith('data:')){
@@ -1571,10 +1647,14 @@ async function descargarFlyer(){
   try {
     await document.fonts.ready;
     const src = document.getElementById('flyer-div');
+    const themeColor = src.style.getPropertyValue('--theme-color') || '#1E5BA8';
+    const themeDark  = src.style.getPropertyValue('--theme-dark')  || '#0e3570';
     const clone = src.cloneNode(true);
     clone.removeAttribute('id');
     clone.querySelectorAll('[id]').forEach(function(el){ el.removeAttribute('id'); });
     clone.style.cssText = 'position:absolute;left:-9999px;top:0;width:1080px;height:1350px;overflow:hidden;font-family:Montserrat,sans-serif';
+    clone.style.setProperty('--theme-color', themeColor);
+    clone.style.setProperty('--theme-dark', themeDark);
 
     const bgImg = clone.querySelector('.flyer-bg-img');
     const origBgImg = src.querySelector('.flyer-bg-img');
