@@ -386,7 +386,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
         <div class="card-title">Desglose fiscal por cuota</div>
         <div class="fiscal-wrap">
           <table class="fiscal-table">
-            <thead>
+            <thead id="fiscal-thead">
               <tr>
                 <th style="text-align:center">C</th>
                 <th>PV total</th>
@@ -417,7 +417,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
     <div>
 
       <!-- TASAS -->
-      <div class="card">
+      <div class="card" id="tasas-card">
         <div class="card-title">Tasas impositivas</div>
         <div class="tasa-row">
           <div class="tasa-item">
@@ -440,7 +440,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
       </div>
 
       <!-- PROVINCIAS -->
-      <div class="card">
+      <div class="card" id="provincias-card">
         <div class="card-title">Provincias — IIBB</div>
         <div style="display:grid;grid-template-columns:1fr 56px 24px;gap:6px;margin-bottom:6px">
           <span style="font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase">Provincia</span>
@@ -644,7 +644,7 @@ let provincias = [
 
 let itemCount = 0, estadoActual = 'pendiente', cotizacionId = null;
 let historialData = [], filtroEstado = 'todos';
-let currentUser = null, currentRole = null;
+let currentUser = null, currentRole = null, currentProfile = null;
 
 function fmt(n){ return '$' + Math.round(n).toLocaleString('es-AR'); }
 function escHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -663,8 +663,13 @@ async function doLogin(){
 async function loadUserProfile(){
   const {data} = await db.from('profiles').select('*').eq('id', currentUser.id).single();
   if(data){
-    currentRole = data.role;
+    currentRole    = data.role;
+    currentProfile = data;
     document.getElementById('nav-nombre').textContent = data.nombre || currentUser.email;
+    // Recargos personalizados: solo para no-admin con array válido en su perfil
+    if(currentRole !== 'admin' && Array.isArray(data.recargos_cuotas) && data.recargos_cuotas.length === 6){
+      recargos = data.recargos_cuotas.map(Number);
+    }
   }
 }
 
@@ -672,7 +677,7 @@ async function doLogout(){
   await db.auth.signOut();
   document.getElementById('app-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
-  currentUser = null; currentRole = null;
+  currentUser = null; currentRole = null; currentProfile = null;
 }
 
 function showApp(){
@@ -680,9 +685,22 @@ function showApp(){
   document.getElementById('app-screen').style.display = 'block';
   renderProvincias();
   renderRecargoGrid();
+  applyVistaPerfil();
   addItem('Vuelo', '', 'ARS');
   addItem('Hospedaje', '', 'USD');
   cargarHistorial();
+}
+
+function applyVistaPerfil(){
+  const simplificada = currentProfile && currentProfile.vista_simplificada === true;
+  document.getElementById('tasas-card').style.display      = simplificada ? 'none' : '';
+  document.getElementById('provincias-card').style.display = simplificada ? 'none' : '';
+  const thead = document.getElementById('fiscal-thead');
+  if(simplificada){
+    thead.innerHTML = '<tr><th style="text-align:center">C</th><th>PV total</th><th>Cuota/mes</th></tr>';
+  } else {
+    thead.innerHTML = '<tr><th style="text-align:center">C</th><th>PV total</th><th>Cuota/mes</th><th>Comisión fc</th><th>Base ÷1.21</th><th>IVA → ARCA</th><th>IIBB</th><th>IDCB</th><th>Te queda real</th></tr>';
+  }
 }
 
 // TABS
@@ -745,9 +763,21 @@ function renderRecargoGrid(){
   recargos.forEach((r, i) => {
     const cell = document.createElement('div');
     cell.className = 'recargo-cell';
-    cell.innerHTML = `<label>${i+1}c</label><input type="number" value="${r}" step="0.5" min="0" oninput="recargos[${i}]=parseFloat(this.value)||0;calcFiscal()">`;
+    cell.innerHTML = `<label>${i+1}c</label><input type="number" value="${r}" step="0.5" min="0" oninput="recargos[${i}]=parseFloat(this.value)||0;calcFiscal();scheduleGuardarRecargos()">`;
     grid.appendChild(cell);
   });
+}
+
+let _recargoSaveTimer = null;
+function scheduleGuardarRecargos(){
+  if(currentRole === 'admin') return;
+  clearTimeout(_recargoSaveTimer);
+  _recargoSaveTimer = setTimeout(guardarRecargosPerfil, 600);
+}
+
+async function guardarRecargosPerfil(){
+  if(!currentUser || currentRole === 'admin') return;
+  await db.from('profiles').update({recargos_cuotas: recargos}).eq('id', currentUser.id);
 }
 
 // PROVINCIAS — renderiza el select (cliente card) y la lista editable (panel derecho)
@@ -845,6 +875,7 @@ function calcFiscal(){
   tbody.innerHTML = '';
   const wspLines = [];
   lastCuotas = [];
+  const simplificada = currentProfile && currentProfile.vista_simplificada === true;
 
   recargos.forEach((recargoPct, i) => {
     const n       = i + 1;
@@ -864,16 +895,23 @@ function calcFiscal(){
     const pillCls = margen >= 10 ? 'pill-green' : margen >= 5 ? 'pill-yellow' : 'pill-red';
 
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${n}</td>
-      <td class="col-pv">${fmt(PV)}</td>
-      <td>${n > 1 ? fmt(cuotaMes) : '—'}</td>
-      <td>${fmt(comision)}</td>
-      <td>${fmt(base)}</td>
-      <td>${fmt(iva)}</td>
-      <td>${fmt(iibb)}</td>
-      <td>${fmt(idcb)}</td>
-      <td class="col-queda">${fmt(teQueda)}<span class="pill-margen ${pillCls}">${margen.toFixed(1)}%</span></td>`;
+    if(simplificada){
+      tr.innerHTML = `
+        <td>${n}</td>
+        <td class="col-pv">${fmt(PV)}</td>
+        <td>${n > 1 ? fmt(cuotaMes) : '—'}</td>`;
+    } else {
+      tr.innerHTML = `
+        <td>${n}</td>
+        <td class="col-pv">${fmt(PV)}</td>
+        <td>${n > 1 ? fmt(cuotaMes) : '—'}</td>
+        <td>${fmt(comision)}</td>
+        <td>${fmt(base)}</td>
+        <td>${fmt(iva)}</td>
+        <td>${fmt(iibb)}</td>
+        <td>${fmt(idcb)}</td>
+        <td class="col-queda">${fmt(teQueda)}<span class="pill-margen ${pillCls}">${margen.toFixed(1)}%</span></td>`;
+    }
     tbody.appendChild(tr);
 
     lastCuotas.push(n === 1 ? fmt(PV) : fmt(cuotaMes));
