@@ -225,19 +225,19 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 .flyer-pre{font-family:'Montserrat',sans-serif;font-size:50px;font-weight:700;color:#fff;text-align:center;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;line-height:1.1}
 .flyer-dest{font-family:'Dancing Script',cursive;font-weight:700;font-size:96px;color:var(--theme-color);text-align:center;line-height:1.05;margin-bottom:28px}
 .flyer-info-block{display:flex;flex-direction:column;gap:18px}
-.flyer-vuelo-row{display:flex;align-items:flex-start;gap:16px;justify-content:center}
-.flyer-vuelo-icon{font-size:28px;line-height:1;flex-shrink:0;margin-top:2px}
-.flyer-vuelo-texts{display:flex;flex-direction:column;gap:2px}
-.flyer-vuelo-main{font-size:32px;font-weight:700;color:#fff;letter-spacing:.5px}
-.flyer-vuelo-legs{display:flex;flex-direction:column;gap:4px;margin-top:4px}
-.flyer-vuelo-leg{display:flex;align-items:baseline;gap:8px}
-.flyer-vuelo-dir{font-size:18px;font-weight:800;color:rgba(255,255,255,.5);width:90px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.flyer-vuelo-row{display:flex;flex-direction:column;align-items:center;width:100%}
+.flyer-vuelo-icon{font-size:28px;line-height:1;margin-bottom:4px}
+.flyer-vuelo-texts{display:flex;flex-direction:column;gap:2px;align-items:center;width:100%}
+.flyer-vuelo-main{font-size:32px;font-weight:700;color:#fff;letter-spacing:.5px;text-align:center}
+.flyer-vuelo-legs{display:flex;flex-direction:column;gap:4px;margin-top:4px;align-items:center;width:100%}
+.flyer-vuelo-leg{display:flex;align-items:baseline;gap:8px;justify-content:center}
+.flyer-vuelo-dir{font-size:18px;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
 .flyer-vuelo-aero{font-size:24px;color:rgba(255,255,255,.85);font-weight:700}
-.flyer-hosp-row{display:flex;align-items:flex-start;gap:16px;justify-content:center}
-.flyer-hosp-icon{font-size:26px;line-height:1;flex-shrink:0;margin-top:2px}
-.flyer-hosp-texts{display:flex;flex-direction:column;gap:3px}
-.flyer-hosp-txt{font-size:32px;color:#fff;font-weight:800}
-.flyer-hosp-dates{font-size:22px;color:rgba(255,255,255,.65);font-weight:700}
+.flyer-hosp-row{display:flex;flex-direction:column;align-items:center;width:100%}
+.flyer-hosp-icon{font-size:26px;line-height:1;margin-bottom:4px}
+.flyer-hosp-texts{display:flex;flex-direction:column;gap:3px;align-items:center;width:100%}
+.flyer-hosp-txt{font-size:32px;color:#fff;font-weight:800;text-align:center}
+.flyer-hosp-dates{font-size:22px;color:rgba(255,255,255,.65);font-weight:700;text-align:center}
 .flyer-ben-list{display:flex;flex-direction:column;gap:8px;align-items:center}
 .flyer-ben-item{display:flex;align-items:baseline;gap:10px;justify-content:center}
 .flyer-ben-check{color:#22c55e;font-size:30px;font-weight:700;flex-shrink:0;line-height:1}
@@ -249,6 +249,7 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
 .flyer-tagline-float{position:absolute;bottom:36px;left:0;right:0;text-align:center;font-family:'Montserrat',sans-serif;text-transform:uppercase}
 .flyer-tagline-l1{font-size:36px;font-weight:900;color:#fff;letter-spacing:3px;line-height:1;text-shadow:2px 2px 6px rgba(0,0,0,.7)}
 .flyer-tagline-l2{font-size:22px;font-weight:900;color:#fff;letter-spacing:4px;line-height:1;margin-top:6px;text-shadow:2px 2px 6px rgba(0,0,0,.7)}
+.flyer-hosp-main{font-size:32px;font-weight:700;color:#fff;letter-spacing:.5px;text-align:center}
 #preview-inner{width:100%;aspect-ratio:1080/1350;overflow:hidden;border-radius:10px;position:relative}
 @media(max-width:700px){
   .flyer-modal{padding:16px 14px}
@@ -597,15 +598,14 @@ input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:va
     <div class="flyer-dest" id="flyer-dest-txt">Destino?</div>
     <div class="flyer-info-block">
       <div id="flyer-vuelo-block" class="flyer-vuelo-row">
-        <div class="flyer-vuelo-icon">✈</div>
         <div class="flyer-vuelo-texts">
           <div class="flyer-vuelo-main" id="flyer-vuelo-main-txt">VUELOS + 2 VALIJAS 20KG</div>
           <div class="flyer-vuelo-legs" id="flyer-vuelo-legs"></div>
         </div>
       </div>
       <div id="flyer-hosp-block" class="flyer-hosp-row">
-        <div class="flyer-hosp-icon">📍</div>
         <div class="flyer-hosp-texts">
+          <div class="flyer-hosp-main">HOSPEDAJE</div>
           <div class="flyer-hosp-txt" id="flyer-hosp-txt">Hotel / Alojamiento</div>
           <div class="flyer-hosp-dates" id="flyer-hosp-dates"></div>
         </div>
@@ -1477,7 +1477,7 @@ function actualizarFlyer(){
 
   if(!_flyerDestKey && destiVal){
     const key = resolveDestino(destiVal);
-    if(key){ _flyerDestKey = key; setFlyerBg(DESTINO_MAP[key]); }
+    if(key){ selectDestThumb(key); } // async: convierte a dataURL antes de setFlyerBg
   }
 
   const vMain = (document.getElementById('fm-vuelo-desc')||{}).value || '';
@@ -1695,17 +1695,15 @@ async function descargarFlyer(){
     clone.style.setProperty('--theme-color', themeColor);
     clone.style.setProperty('--theme-dark', themeDark);
 
-    const bgImg = clone.querySelector('.flyer-bg-img');
-    const origBgImg = src.querySelector('.flyer-bg-img');
-    if(bgImg && origBgImg && origBgImg.src && !origBgImg.src.startsWith('data:')){
-      const dataUrl = await toDataUrl(origBgImg.src);
-      if(dataUrl) bgImg.src = dataUrl;
-    }
-    const logoImg = clone.querySelector('.flyer-logo-img');
-    const origLogoImg = src.querySelector('.flyer-logo-img');
-    if(logoImg && origLogoImg && origLogoImg.src && !origLogoImg.src.startsWith('data:')){
-      const dataUrl = await toDataUrl(origLogoImg.src);
-      if(dataUrl) logoImg.src = dataUrl;
+    // Convertir TODAS las imágenes del clone a dataURL — cualquier src file:// tainta el canvas
+    const cloneImgs = clone.querySelectorAll('img');
+    const origImgs  = src.querySelectorAll('img');
+    for(let i = 0; i < cloneImgs.length; i++){
+      const rawSrc = (origImgs[i] || cloneImgs[i]).getAttribute('src') || '';
+      if(!rawSrc || rawSrc.startsWith('data:')) continue;
+      const resolvedSrc = (origImgs[i] || cloneImgs[i]).src;
+      const dataUrl = await toDataUrl(resolvedSrc);
+      cloneImgs[i].src = dataUrl || ''; // vaciar si falla — mejor sin imagen que canvas taintado
     }
 
     document.body.appendChild(clone);
